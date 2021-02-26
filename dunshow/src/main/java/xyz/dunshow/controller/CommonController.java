@@ -12,13 +12,6 @@ import xyz.dunshow.dto.UserSession;
 @Controller
 public class CommonController {
 
-	@RequestMapping("/")
-	public String a(@LoginUser UserSession userSession, Model model) {
-		model.addAttribute("email", userSession.getEmail());
-		model.addAttribute("sub", userSession.getSub());
-		return "main";
-	}
-	
 	@GetMapping("/main")
     public String main(Model model, @LoginUser UserSession userSession) {
 		model.addAttribute("email", userSession.getEmail());
