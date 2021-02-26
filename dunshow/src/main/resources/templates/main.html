@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/base}">
+
+<div layout:fragment="content">
+	<p th:text="${email}"></p>
+	<p th:text="${sub}"></p>
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+    </script>
+</th:block>
+
+</html>

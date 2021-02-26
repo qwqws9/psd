@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>크루메이트 인사고과관리 시스템</title>
+<!--     <link rel="shortcut icon" th:href="@{/img/favicon.ico}"> -->
+<!--     <link rel="stylesheet" th:href="@{/css/font-awesome.css}"> -->
+<!--     <link rel="stylesheet" th:href="@{/css/common.css}"> -->
+<!--     <link rel="stylesheet" th:href="@{/css/theme_typeA.css}"> -->
+<!--     <link rel="stylesheet" th:href="@{/css/lib/jquery-ui.min.css}"> -->
+<!--     <link rel="stylesheet" th:href="@{/css/lib/tui-date-picker.css}"> -->
+<!--     <link rel="stylesheet" th:href="@{/css/lib/tui-grid.css}"> -->
+    <script>
+        // 프로젝트 네임스페이스
+        window.crew = {};
+    </script>
+<!--     <script type="text/javascript" th:src="@{/js/lib/jquery-3.5.1.min.js}"></script> -->
+<!--     <script type="text/javascript" th:src="@{/js/lib/jquery-ui.min.js}"></script> -->
+<!--     <script type="text/javascript" th:src="@{/js/lib/jquery.loading.min.js}"></script> -->
+<!--     <script type="text/javascript" th:src="@{/js/lib/dayjs.min.js}"></script> -->
+<!--     <script type="text/javascript" th:src="@{/js/util.js}"></script> -->
+<!--     <script type="text/javascript" th:src="@{/js/lib/tui-date-picker.js}"></script> -->
+<!--     <script type="text/javascript" th:src="@{/js/lib/tui-grid.js}"></script> -->
+<!--     <script type="text/javascript" th:src="@{/js/lib/handlebars.min-v4.7.6.js}"></script> -->
+<!--     <script type="text/javascript" th:src="@{/js/handlebars-helper.js}"></script> -->
+    <script>
+//         $(document).ajaxStart(function () {
+//             $('body').loading({
+//                 theme: 'dark'
+//             });
+//         });
+//         $(document).ajaxComplete(function () {
+//             $('body').loading('stop');
+//         });
+//         $(document).ajaxError(function (event, request, settings) {
+//             if (!request.responseJSON) {
+//                 alert('오류가 발생하였습니다.');
+//                 return;
+//             }
+//             if (request.status === 500 || request.status === 400) {
+//                 alert(request.responseJSON.message);
+//             }
+//         });
+//         $(document).ready(function () {
+//             $('#sideNavbar').find('.has-sub > a').on('click', function (e) {
+//                 var $li = $(e.currentTarget).parent('li');
+//                 $li.toggleClass('active').find('ul:first').slideToggle(200);
+//             });
+//         });
+    </script>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="header-wrap">
+<!--             <th:block th:replace="fragment/header :: header"></th:block> -->
+        </div>
+        <div class="container-wrap">
+            <div class="container-wrap-inner">
+                <nav class="sidebar-menu">
+<!--                     <th:block th:replace="/fragment/sidemenu :: sidemenu"></th:block> -->
+                </nav>
+                <div class="container">
+                    <article class="contents">
+                        <th:block layout:fragment="content"></th:block>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--     <th:block th:replace="/fragment/footer :: footer"></th:block> -->
+<!--     <th:block layout:fragment="handlebars"></th:block> -->
+    <th:block layout:fragment="script"></th:block>
+</body>
+
+</html>
