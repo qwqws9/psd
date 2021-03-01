@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/base}">
+
+<div layout:fragment="content" class="container-fluid p-0 loading" id="content">
+    <h1 th:text="${status}"></h1>
+    <h2>
+    	<span th:if="${status == 400}">잘못된 요청입니다. <b>:(</b></span>
+    	<span th:if="${status == 403}">권한이 없습니다. <b>:(</b></span>
+    	<span th:if="${status == 404}">요청하신 페이지를 찾을 수 없습니다. <b>:(</b></span>
+    </h2>
+    <div class="gears">
+        <div class="gear one">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <div class="gear two">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <div class="gear three">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    setTimeout(function(){
+        $('#content').removeClass('loading');
+      }, 1000);
+    </script>
+</div>
+
+</html>

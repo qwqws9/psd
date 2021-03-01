@@ -45,6 +45,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             throw new OAuth2AuthenticationException(new OAuth2Error("use_yn_n"), "사용불가 상태인 계정입니다.");
         }
 
+        dto.setPicture(oAuth2User.getAttribute("picture"));
         UserSession userSession = new UserSession(dto);
 
         this.httpSession.setAttribute(SessionKey.LOGIN.getValue(), userSession);

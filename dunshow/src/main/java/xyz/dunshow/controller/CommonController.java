@@ -6,11 +6,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import lombok.RequiredArgsConstructor;
 import xyz.dunshow.annotation.LoginUser;
 import xyz.dunshow.dto.UserSession;
+import xyz.dunshow.service.FileIoService;
+import xyz.dunshow.service.OpenApiService;
 
 @Controller
+@RequiredArgsConstructor
 public class CommonController {
+    
+    private final OpenApiService openApiService;
+    
+    private final FileIoService fileIoService;
 
 	@GetMapping("/main")
     public String main(Model model, @LoginUser UserSession userSession) {
@@ -25,10 +33,11 @@ public class CommonController {
 		return "login/userLogin";
 	}
 	
-	@RequestMapping("/mainHome")
+	@RequestMapping("/test")
 	@ResponseBody
 	public String b() {
-		System.out.println("?");
-		return "1";
+		return "";
 	}
+	
+	
 }

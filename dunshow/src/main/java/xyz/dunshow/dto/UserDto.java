@@ -13,4 +13,5 @@ public class UserDto extends BaseDto {
 	private String role;
 	private String regDt;
 	private String useYn;
+	private String picture;
 }

@@ -22,10 +22,10 @@ public class UserService {
 		User entity = this.userRepository.findBySub(dto.getSub());
 		
 		if (entity == null) {
-			if ("dunshowprice@gmail.com".equals(dto.getEmail())) { dto.setRole(UserRole.ADMIN.getValue()); }
+		    dto.setRole(UserRole.USER.getValue());
 			dto.setUseYn("Y");
-			dto.setRole(UserRole.USER.getValue());
 			dto.setRegDt(DateUtils.getDateString(new Date()));
+			if ("dunshowprice@gmail.com".equals(dto.getEmail())) { dto.setRole(UserRole.ADMIN.getValue()); }
 			entity = this.userRepository.save(dto.toEntity(User.class));
 		}
 		

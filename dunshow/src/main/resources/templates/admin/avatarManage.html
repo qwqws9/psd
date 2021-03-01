@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/base}">
+
+<div layout:fragment="content" class="container-fluid p-0">
+	<div class="col-12 col-lg-6">
+<!-- 		<div class="card"> -->
+<!-- 			<div class="card-header"> -->
+<!-- 				<h5 class="card-title">아바타 Data Insert</h5> -->
+<!-- 				<select class="form-control mb-3" id="selectJob"> -->
+<!-- 			          <option>선택</option> -->
+<!-- 			          <th:block th:each="item : ${jobList}"> -->
+<!-- 			          	<option th:value="${item.jobValue}" th:text="${item.jobName}"></option> -->
+<!-- 			          </th:block> -->
+<!--         		</select> -->
+<!-- 			</div> -->
+<!-- 			<div class="card-body text-center"> -->
+<!-- 				<div class="mb-3"> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioInsert('hair')">머리</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioInsert('cap')">모자</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioInsert('face')">얼굴</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioInsert('neck')">목가슴</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioInsert('coat')">상의</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioInsert('pants')">하의</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioInsert('belt')">허리</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioInsert('shoes')">신발</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioInsert('skin')">피부</button> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+	</div>
+	
+	<div class="col-12 col-lg-6">
+<!-- 		<div class="card"> -->
+<!-- 			<div class="card-header"> -->
+<!-- 				<h5 class="card-title">아바타 ItemId 조회 후 Insert</h5> -->
+<!-- 				<select class="form-control mb-3" id="selectJob2"> -->
+<!-- 			          <option>선택</option> -->
+<!-- 			          <th:block th:each="item : ${jobList}"> -->
+<!-- 			          	<option th:value="${item.jobValue}" th:text="${item.jobName}"></option> -->
+<!-- 			          </th:block> -->
+<!--         		</select> -->
+<!-- 			</div> -->
+<!-- 			<div class="card-body text-center"> -->
+<!-- 				<div class="mb-3"> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioIdInsert('hair')">머리</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioIdInsert('cap')">모자</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioIdInsert('face')">얼굴</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioIdInsert('neck')">목가슴</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioIdInsert('coat')">상의</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioIdInsert('pants')">하의</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioIdInsert('belt')">허리</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioIdInsert('shoes')">신발</button> -->
+<!-- 					<button class="btn btn-outline-primary" onclick="ioIdInsert('skin')">피부</button> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+	</div>
+	<div class="col-12 col-lg-6">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">Emblem 조회</h5>
+			</div>
+			<div class="card-body text-center">
+				<div class="mb-3">
+					<button class="btn btn-outline-primary" onclick="getEmblem()">조회</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+    $(document).ready(function () {
+    	$.when(
+            $.get('/admin/data.ajax')
+            ).then(function (res1) {
+                initData(res1.data);
+            });
+    });
+    
+    function initData(res) {
+    	var data = res.data;
+    }
+    
+    function ioInsert(target) {
+    	var job = $('#selectJob').val();
+    	
+    	if (!job) {
+    		return false;
+    	}
+    	$.ajax({
+    		url : '/admin/ioInsert.ajax',
+    		data : {
+    			job : job,
+    			target : target
+    		},
+    		success : function(res) {
+    			alert(res.message);
+    		}
+    	})
+    	
+    }
+    
+    function ioIdInsert(target) {
+    	var job = $('#selectJob2').val();
+    	
+    	if (!job) {
+    		return false;
+    	}
+    	$.ajax({
+    		url : '/admin/ioIdInsert.ajax',
+    		data : {
+    			job : job,
+    			target : target
+    		},
+    		success : function(res) {
+    			alert(res.message);
+    		}
+    	})
+    	
+    }
+    
+    function getEmblem() {
+    	$.ajax({
+    		url : '/admin/emblem.ajax',
+    		data : {
+    		},
+    		success : function(res) {
+    			alert(res.message);
+    		}
+    	})
+    	
+    }
+    </script>
+</th:block>
+
+</html>
