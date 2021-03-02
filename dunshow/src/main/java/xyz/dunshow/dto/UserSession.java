@@ -12,7 +12,7 @@ public class UserSession implements Serializable {
     private String email;
     private String sub;
     private String role;
-    private String picture;
+    public String picture;
 
     public UserSession(UserDto user) {
         this.usrSeq = user.getUsrSeq();

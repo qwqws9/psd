@@ -36,22 +36,33 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-3 col-lg-3">
+	<div class="col-12 col-lg-12">
+	
 		<div class="card">
 			<div class="card-body text-center">
 				<div class="mb-3">
 					<h5 class="card-title">CharId 조회</h5>
-					<select id="server">
+					<div class="row">
+					<div class="mb-3 col-md-2">
+					<select id="server" class="form-control">
 						<option th:each="code : ${T(xyz.dunshow.constants.Server).values()}"
 								th:value="${code.value}" th:text="${code.desc}">
 						</option>
 					</select>
-					<input type="text" id="name"/>
+					</div>
+					<div class="mb-3 col-md-8">
+					<input type="text" id="name" class="form-control"/>
+					</div>
+					<div class="mb-3 col-md-2">
 					<button class="btn btn-outline-primary" onclick="charIdTest()">실행</button>
+					</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+	
+	
 	</div>
 	</div>
 	<div class="col-6 col-lg-6">

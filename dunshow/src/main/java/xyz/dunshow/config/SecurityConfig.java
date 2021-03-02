@@ -4,6 +4,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
+import xyz.dunshow.constants.UserRole;
 import xyz.dunshow.service.CustomOAuth2UserService;
 
 @EnableWebSecurity
@@ -22,10 +23,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
          .headers().frameOptions().disable() 
          .and()
              .authorizeRequests()
-             .antMatchers("/favicon.ico", "/static/**", "/oauth2/**", "/user/login").permitAll()
-//             .antMatchers("/api/v1/**").hasRole(Role.
-//                                              USER.name())
-             .anyRequest().authenticated()
+             .antMatchers("/favicon.ico", "/static/**", "/oauth2/**").permitAll()
+             .antMatchers("/admin/**").hasRole(UserRole.
+                                              ADMIN.getRole())
+             .anyRequest().permitAll()//.authenticated()
          .and()
              .oauth2Login()
                  .userInfoEndpoint()

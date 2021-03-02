@@ -19,4 +19,5 @@ public class EmblemDto extends BaseDto {
     private String emblemId;
     private String emblemName;
     private String rate;
+    private String buffYn;
 }

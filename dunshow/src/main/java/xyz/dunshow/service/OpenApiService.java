@@ -28,6 +28,7 @@ import xyz.dunshow.constants.Server;
 import xyz.dunshow.dto.EnumCode;
 import xyz.dunshow.entity.ShowRoom;
 import xyz.dunshow.exception.BusinessException;
+import xyz.dunshow.repository.ShowRoomRepository;
 import xyz.dunshow.util.EncodeUtil;
 import xyz.dunshow.util.EnumCodeUtil;
 
@@ -165,6 +166,9 @@ public class OpenApiService {
     	if (StringUtils.isEmpty(enumCodeUtil.get(Server.CODE, server))) {
     		throw new BusinessException("서버 선택이 잘못되었습니다.");
     	}
+    	if (StringUtils.isEmpty(name)) {
+    	    throw new BusinessException("캐릭터명을 입력해 주세요.");
+    	}
         StringBuilder sb = new StringBuilder();
         sb.append(ApiKey.NEOPLE_API_URL);
         sb.append("servers/");
@@ -181,11 +185,10 @@ public class OpenApiService {
         JSONParser parse = new JSONParser();
         List<String> list = Lists.newArrayList();
         try {
-        	// 하나도 없을때 어떻게되는지 해봐야함
 			JSONObject obj = (JSONObject)parse.parse(rs);
 			JSONArray jsonArr = (JSONArray) obj.get("rows");
 			for (int i = 0; i < jsonArr.size(); i++) {
-				JSONObject obj2 = (JSONObject) jsonArr.get(0);
+				JSONObject obj2 = (JSONObject) jsonArr.get(i);
 				list.add(obj2.get("characterId").toString());
 			}
 		} catch (ParseException e) {
@@ -194,7 +197,41 @@ public class OpenApiService {
         
         return list;
     }
+    
+    /**
+     *  마켓 등록물품 조회
+     * @param title
+     * @param emblemCode
+     * @param rarity
+     * @param jobId
+     * @param limit
+     * @return
+     */
+    public String getMarket(String title, String emblemCode, String rarity, String jobId, String limit) {
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append(ApiKey.NEOPLE_API_URL);
+        sb.append("avatar-market/sale?title=");
+        sb.append(title);
+        sb.append("&q=jobId:");
+        sb.append(jobId);
+        sb.append(",emblemCode:");
+        sb.append(emblemCode);
+        sb.append(",avatarRarity");
+        sb.append(rarity);
+        sb.append("&sort=price:asc");
+        sb.append("&limit=");
+        sb.append(limit);
+        sb.append("&apikey=");
+        sb.append(ApiKey.NEOPLE_API_KEY);
+        
+        String rs = this.callApi(sb.toString());
+        
+        return "";
+    }
 
+    // 교불 조회할때 사용할것.
+    // https://api.neople.co.kr/df/auction?itemName=[마창사]&wordType=full&sort=unitPrice:asc&q=rarity:레어,maxLevel:1&apikey=OLejPB3xs8EIqMVrvRNOrYp1eY3UD8oP
     public String callApi(String requestUrl) {
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
@@ -222,5 +259,46 @@ public class OpenApiService {
         }
 
         return sb.toString();
+    }
+    
+    
+    private final ShowRoomRepository showRoomRepository;
+    @Transactional
+    public void ioIdInsert() {
+        List<ShowRoom> entity = this.showRoomRepository.findAll();
+        StringBuilder sb = new StringBuilder();
+
+        for (ShowRoom s : entity) {
+            sb.setLength(0);
+            sb.append(ApiKey.NEOPLE_API_URL);
+            sb.append("items?itemName=");
+            sb.append(EncodeUtil.encodeURIComponent(s.getAvatarName()));
+            sb.append("&apikey=");
+            sb.append(ApiKey.NEOPLE_API_KEY);
+            String rs = callApi(sb.toString());
+
+            JSONParser parse = new JSONParser();
+            JSONObject object;
+            sb.setLength(0);
+            try {
+                object = (JSONObject) parse.parse(rs);
+                JSONArray stat = (JSONArray) object.get("rows");
+                if (!stat.isEmpty()) {
+                    for (int i = 0; i < stat.size(); i++) {
+                        JSONObject obj = (JSONObject) stat.get(i);
+                        sb.append(obj.get("itemRarity"));
+                        if (i != (stat.size() -1) ) { sb.append(","); }
+                    }
+                    s.setRarity(sb.toString());
+                    System.out.println("Insert 완료 : " + sb.toString());
+                }
+
+            } catch (ParseException e) {
+                System.out.println(sb.toString());
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
     }
 }

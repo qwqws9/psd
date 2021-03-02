@@ -15,10 +15,8 @@ import com.google.common.collect.Maps;
 
 import lombok.RequiredArgsConstructor;
 import xyz.dunshow.dto.AjaxResponse;
-import xyz.dunshow.dto.ShowRoomDto;
 import xyz.dunshow.entity.ShowRoom;
 import xyz.dunshow.exception.BusinessException;
-import xyz.dunshow.exception.PageException;
 import xyz.dunshow.service.AvatarService;
 import xyz.dunshow.service.JobService;
 import xyz.dunshow.view.Views;

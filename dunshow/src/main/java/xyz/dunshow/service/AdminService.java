@@ -67,19 +67,21 @@ public class AdminService {
         ClassPathResource resource = new ClassPathResource("static/initData/showroomdata.txt");
 
         try {
+            this.showRoomRepository.deleteAll();
             Path path = Paths.get(resource.getURI());
             List<String> content = Files.readAllLines(path);
             String[] arr;
             ShowRoomDto room;
 
             for (String s : content) {
-                arr = s.split(",");
+                arr = s.split("▦");
                 room = new ShowRoomDto();
                 room.setAvatarName(arr[0]);
                 room.setItemId(arr[1]);
                 room.setPartsName(arr[2]);
                 room.setPreviewIndex(arr[3]);
                 room.setJobSeq(arr[4]);
+                room.setRarity(arr[5]);
 
                 this.showRoomRepository.save(room.toEntity(ShowRoom.class));
             }
@@ -106,14 +108,16 @@ public class AdminService {
 
             for (ShowRoom s : entity) {
                 br.append(s.getAvatarName());
-                br.append(",");
+                br.append("▦");
                 br.append(s.getItemId());
-                br.append(",");
+                br.append("▦");
                 br.append(s.getPartsName());
-                br.append(",");
+                br.append("▦");
                 br.append(s.getPreviewIndex());
-                br.append(",");
+                br.append("▦");
                 br.append(s.getJobSeq());
+                br.append("▦");
+                br.append(s.getRarity());
                 br.newLine();
             }
 
@@ -215,7 +219,7 @@ public class AdminService {
     			emblem.setEmblemId(e2.attr("onclick").substring(30).replace("'", ""));
     			emblem.setEmblemName(e2.text().trim());
     			emblem.setJobDetailSeq(j.getJobDetailSeq());
-    			
+    			emblem.setBuffYn("N");
     			emblemList.add(emblem);
     		}
     	}

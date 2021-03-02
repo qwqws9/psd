@@ -38,4 +38,6 @@ public class ShowRoom extends BaseEntity {
 	private String partsName;
 	@Column
 	private String itemId;
+	@Column
+	private String rarity;
 }

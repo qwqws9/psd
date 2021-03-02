@@ -30,4 +30,6 @@ public class Emblem extends BaseEntity {
     private String emblemName;
 	@Column
 	private String rate;
+	@Column
+	private String buffYn;
 }

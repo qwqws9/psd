@@ -79,8 +79,8 @@ public class AdminController {
 		} else if ("initJobDetail".equals(target)) {
 			this.adminService.getJobDetail();
 			
-		} else if ("initShowRoomData".equals(target)) {
-			
+		} else if ("ioIdInsert".equals(target)) {
+			this.openApiService.ioIdInsert();
 		}
 		
         
