@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/base}">
+
+<div layout:fragment="content" class="container-fluid p-0">
+<div class="row">
+<div class="col-6 col-lg-6">
+<div class="row">
+	<div class="col-3 col-lg-3">
+		<div class="card">
+			<div class="card-body text-center">
+				<div class="mb-3">
+					<h5 class="card-title">1. Init jobDetail Data</h5>
+					<button class="btn btn-outline-primary" onclick="dataManage('initJobDetail')">실행</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-3 col-lg-3">
+		<div class="card">
+			<div class="card-body text-center">
+				<div class="mb-3">
+					<h5 class="card-title">2. Init Emblem Data</h5>
+					<button class="btn btn-outline-primary" onclick="dataManage('initemblemData')">실행</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-3 col-lg-3">
+		<div class="card">
+			<div class="card-body text-center">
+				<div class="mb-3">
+					<h5 class="card-title">3. Init Avatar Data</h5>
+					<button class="btn btn-outline-primary" onclick="dataManage('initShowRoomData')">실행</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-3 col-lg-3">
+		<div class="card">
+			<div class="card-body text-center">
+				<div class="mb-3">
+					<h5 class="card-title">CharId 조회</h5>
+					<select id="server">
+						<option th:each="code : ${T(xyz.dunshow.constants.Server).values()}"
+								th:value="${code.value}" th:text="${code.desc}">
+						</option>
+					</select>
+					<input type="text" id="name"/>
+					<button class="btn btn-outline-primary" onclick="charIdTest()">실행</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	</div>
+	<div class="col-6 col-lg-6">
+	<div class="row">
+	<div class="col-3 col-lg-3">
+		<div class="card">
+			<div class="card-body text-center">
+				<div class="mb-3">
+					<h5 class="card-title">BackUp Avatar Data</h5>
+					<button class="btn btn-outline-danger" onclick="dataManage('bakShowRoomData')">실행</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div></div>
+</div>
+</div>
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+    $(document).ready(function () {
+    	$.when(
+            $.get('/admin/data.ajax')
+            ).then(function (res1) {
+                initData(res1.data);
+            });
+    });
+    
+    function initData(res) {
+    	var data = res.data;
+    }
+    
+    function dataManage(target) {
+    	$.ajax({
+    		url : '/admin/dataManage.ajax',
+    		data : {
+    			target : target
+    		},
+    		success : function(res) {
+    			alert(res.message);
+    		}
+    	})
+    	
+    }
+    
+    function ioIdInsert(target) {
+    	var job = $('#selectJob2').val();
+    	
+    	if (!job) {
+    		return false;
+    	}
+    	$.ajax({
+    		url : '/admin/ioIdInsert.ajax',
+    		data : {
+    			job : job,
+    			target : target
+    		},
+    		success : function(res) {
+    			alert(res.message);
+    		}
+    	})
+    	
+    }
+    
+    function charIdTest() {
+    	var server = $('#server').val();
+    	var name = $('#name').val();
+    	
+    	$.ajax({
+    		url : '/admin/charIdTest.ajax',
+    		data : {
+    			server : server,
+    			name : name
+    		},
+    		success : function(res) {
+    			console.log(res.data);
+    		}
+    	})
+    }
+    
+    function saveJobDetail() {
+    	$.ajax({
+    		url : '/admin/saveJobDetail.ajax',
+    		data : {
+    		},
+    		success : function(res) {
+    			alert(res.message);
+    		}
+    	})
+    }
+    </script>
+</th:block>
+
+</html>

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import lombok.RequiredArgsConstructor;
 import xyz.dunshow.annotation.LoginUser;
 import xyz.dunshow.dto.UserSession;
-import xyz.dunshow.service.FileIoService;
 import xyz.dunshow.service.OpenApiService;
 
 @Controller
@@ -18,8 +17,6 @@ public class CommonController {
     
     private final OpenApiService openApiService;
     
-    private final FileIoService fileIoService;
-
 	@GetMapping("/main")
     public String main(Model model, @LoginUser UserSession userSession) {
 		model.addAttribute("email", userSession.getEmail());

@@ -6,4 +6,5 @@ import xyz.dunshow.entity.Job;
 
 public interface JobRepository extends JpaRepository<Job, Integer>{
 
+	Job findByJobName(String jobName);
 }

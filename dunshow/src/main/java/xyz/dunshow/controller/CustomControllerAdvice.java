@@ -55,7 +55,8 @@ public class CustomControllerAdvice extends ResponseEntityExceptionHandler {
         log.error("RuntimeException Handler", e);
         if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
             MappingJackson2JsonView view = new MappingJackson2JsonView();
-            view.setAttributesMap(new AjaxResponse("ERROR", ErrorMessage.ERROR.getMessage()).getMap());
+//            view.setAttributesMap(new AjaxResponse("ERROR", ErrorMessage.ERROR.getMessage()).getMap());
+            view.setAttributesMap(new AjaxResponse("ERROR", e.getMessage()).getMap());
             return view;
         }
         model.addAttribute("message", ErrorMessage.ERROR.getMessage());

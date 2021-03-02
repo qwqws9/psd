@@ -14,15 +14,15 @@ import com.google.common.collect.Maps;
 
 import lombok.RequiredArgsConstructor;
 import xyz.dunshow.annotation.LoginUser;
+import xyz.dunshow.constants.ErrorMessage;
 import xyz.dunshow.constants.UserRole;
 import xyz.dunshow.dto.AjaxResponse;
 import xyz.dunshow.dto.UserSession;
-import xyz.dunshow.entity.ShowRoom;
+import xyz.dunshow.exception.BusinessException;
 import xyz.dunshow.exception.PageException;
-import xyz.dunshow.repository.ShowRoomRepository;
 import xyz.dunshow.service.AdminService;
-import xyz.dunshow.service.FileIoService;
 import xyz.dunshow.service.JobService;
+import xyz.dunshow.service.OpenApiService;
 import xyz.dunshow.view.Views;
 
 @Controller
@@ -32,11 +32,11 @@ public class AdminController {
     
     private final JobService jobService;
     
-    private final FileIoService fileIoService;
-    
     private final AdminService adminService;
     
-	@GetMapping("/avatarManage")
+    private final OpenApiService openApiService;
+    
+	@GetMapping("/dataManage")
     public String main(Model model, @LoginUser UserSession userSession) {
 	    if (!UserRole.ADMIN.getValue().equals(userSession.getRole())) {
 	        throw new PageException("권한이 없습니다.");
@@ -45,7 +45,7 @@ public class AdminController {
 	    model.addAttribute("jobList", this.jobService.getJobList());
 	    
 	    
-        return "admin/avatarManage";
+        return "admin/dataManage";
     }
 	
 	@GetMapping("/data.ajax")
@@ -59,28 +59,46 @@ public class AdminController {
 	    return new AjaxResponse(map);
 	}
 	
-	@GetMapping("/ioInsert.ajax")
+	@GetMapping("/dataManage.ajax")
     @ResponseBody
     @JsonView(Views.Simple.class)
-    public AjaxResponse ioInsert(String job, String target) {
-        this.fileIoService.fileReader(job, target);
+    public AjaxResponse dataManage(String target, @LoginUser UserSession userSession) {
+		if (!UserRole.ADMIN.getValue().equals(userSession.getRole())) {
+			throw new BusinessException(ErrorMessage.PERMISSION_DENIED.getMessage());
+		}
+		
+		if ("initShowRoomData".equals(target)) {
+			this.adminService.initShowRoomData();
+			
+		} else if ("bakShowRoomData".equals(target)) {
+			this.adminService.bakShowRoomData();
+			
+		} else if ("initemblemData".equals(target)) {
+			this.adminService.getEmblem();
+			
+		} else if ("initJobDetail".equals(target)) {
+			this.adminService.getJobDetail();
+			
+		} else if ("initShowRoomData".equals(target)) {
+			
+		}
+		
+        
+        
         
         return new AjaxResponse("200", "성공");
     }
 	
-	@GetMapping("/ioIdInsert.ajax")
+	@GetMapping("/charIdTest.ajax")
 	@ResponseBody
 	@JsonView(Views.Simple.class)
-	public AjaxResponse ioIdInsert(String job, String target) {
-	    this.fileIoService.ioIdInsert(job, target);
-	    return new AjaxResponse("200", "성공");
+	public AjaxResponse charIdTest(String server, String name) {
+		Map<String, Object> map = Maps.newHashMap();
+		
+		List<String> list = this.openApiService.getCharacterId(server, name, "50");
+		
+		map.put("data", list);
+		
+	    return new AjaxResponse(map);
 	}
-	
-	@GetMapping("/emblem.ajax")
-    @ResponseBody
-    @JsonView(Views.Simple.class)
-    public AjaxResponse getDnfNowEmbl(String job, String target) {
-	    this.adminService.getEmblem();
-        return new AjaxResponse("200", "성공");
-    }
 }
