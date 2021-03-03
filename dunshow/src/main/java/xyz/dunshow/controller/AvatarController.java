@@ -3,11 +3,15 @@ package xyz.dunshow.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -15,10 +19,13 @@ import com.google.common.collect.Maps;
 
 import lombok.RequiredArgsConstructor;
 import xyz.dunshow.dto.AjaxResponse;
+import xyz.dunshow.dto.InfoDto;
 import xyz.dunshow.entity.ShowRoom;
 import xyz.dunshow.exception.BusinessException;
 import xyz.dunshow.service.AvatarService;
+import xyz.dunshow.service.DataService;
 import xyz.dunshow.service.JobService;
+import xyz.dunshow.service.OpenApiService;
 import xyz.dunshow.view.Views;
 
 @Controller
@@ -29,6 +36,10 @@ public class AvatarController {
     private final AvatarService avatarService;
     
     private final JobService jobService;
+    
+    private final OpenApiService openApiService;
+    
+    private final DataService dataService;
     
     @GetMapping("/showroom")
     public String test(Model model) {
@@ -66,5 +77,27 @@ public class AvatarController {
         map.put("data", dtoList);
         
         return new AjaxResponse(map);
+    }
+    
+    @GetMapping("/search/list")
+	public String searchList(String server, String name, Model model) {
+		List<InfoDto> list = this.openApiService.getCharacterId(server, name, "50");
+		if (CollectionUtils.isEmpty(list)) {
+			model.addAttribute("msg", "서버, 캐릭터명을 확인해 주세요.");
+		}
+		model.addAttribute("data", list);
+	    return "search/list";
+	}
+    
+    @RequestMapping("/search/detail/{serverId}/{characterId}")
+    public String searchDetail(@PathVariable String serverId, @PathVariable String characterId, Model model) {
+    	
+    	Map<String, Object> map = this.dataService.getSearchDetail(serverId, characterId);
+    	
+    	model.addAttribute("data", map.get("data"));
+    	model.addAttribute("totalPrice", map.get("totalPrice"));
+    	model.addAttribute("totalAverage", map.get("totalAverage"));
+    	
+    	return "search/detail";
     }
 }

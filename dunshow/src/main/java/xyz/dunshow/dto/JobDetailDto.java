@@ -1,5 +1,7 @@
 package xyz.dunshow.dto;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -20,4 +22,7 @@ public class JobDetailDto extends BaseDto {
     private String thirdJob;
     private String fourthJob;
     private String jobValue;
+    private JobDto job;
+    private List<EmblemDto> emblems;
+    
 }

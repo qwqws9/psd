@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/base}">
+
+<div layout:fragment="content">
+	<th:block th:each="data : ${data}">
+		<p th:text="${data.slotName}"></p>
+		<hr class="my-0">
+		<p th:text="${data.itemId}"></p>
+		<hr class="my-0">
+		<p th:text="${data.itemName}"></p>
+		<hr class="my-0">
+		<p th:text="${data.unitPrice}"></p>
+		<hr class="my-0">
+		<p th:text="${data.averagePrice}"></p>
+		<hr class="my-0">
+	</th:block>
+	<p th:text="${totalPrice}"></p>
+	<p th:text="${totalAverage}"></p>
+</div>
+
+
+<th:block layout:fragment="script">
+<script type="text/javascript">
+
+</script>
+</th:block>
+
+</html>

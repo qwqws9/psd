@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
-import org.thymeleaf.spring5.view.ThymeleafView;
 
 import lombok.extern.slf4j.Slf4j;
 import xyz.dunshow.constants.ErrorMessage;
@@ -38,29 +37,35 @@ public class CustomControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-    public View handle(BusinessException e, HttpServletRequest request, Model model) {
+    public ModelAndView handle(BusinessException e, HttpServletRequest request, Model model) {
         log.info("BusinessException Handler", e);
+        ModelAndView mv = new ModelAndView();
         if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
             MappingJackson2JsonView view = new MappingJackson2JsonView();
             view.setAttributesMap(new AjaxResponse(e.getCode(), e.getMessage()).getMap());
-            return view;
+            mv.setView(view);
+            return mv;
         }
-        model.addAttribute("message", e.getMessage());
-        return new ThymeleafView("/error/custom");
+        mv.setViewName("/error/custom");
+        mv.addObject("message", e.getMessage());
+        return mv;
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-    public View handle(RuntimeException e, HttpServletRequest request, Model model) {
+    public ModelAndView handle(RuntimeException e, HttpServletRequest request, Model model) {
         log.error("RuntimeException Handler", e);
+        ModelAndView mv = new ModelAndView();
         if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
             MappingJackson2JsonView view = new MappingJackson2JsonView();
 //            view.setAttributesMap(new AjaxResponse("ERROR", ErrorMessage.ERROR.getMessage()).getMap());
             view.setAttributesMap(new AjaxResponse("ERROR", e.getMessage()).getMap());
-            return view;
+            mv.setView(view);
+            return mv;
         }
-        model.addAttribute("message", ErrorMessage.ERROR.getMessage());
-        return new ThymeleafView("/error/custom");
+        mv.setViewName("/error/500");
+        mv.addObject("message", ErrorMessage.ERROR.getMessage());
+        return mv;
     }
 
     @Override

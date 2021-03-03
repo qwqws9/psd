@@ -30,6 +30,7 @@ import com.google.common.collect.Lists;
 
 import lombok.RequiredArgsConstructor;
 import xyz.dunshow.constants.ApiKey;
+import xyz.dunshow.dto.JobDetailDto;
 import xyz.dunshow.dto.ShowRoomDto;
 import xyz.dunshow.entity.Emblem;
 import xyz.dunshow.entity.Job;
@@ -133,57 +134,50 @@ public class AdminService {
      */
     @Transactional
     public void getJobDetail() {
-        String rs = this.openApiService.getJobs();
+    	JSONObject object = this.openApiService.getJobs();
         this.jobDetailRepository.deleteAll();
 
-        JSONParser parse = new JSONParser();
-        JSONObject object;
         JobDetail jobDetail;
         List<JobDetail> list = Lists.newArrayList();
 
-        try {
-            object = (JSONObject) parse.parse(rs);
-            JSONArray stat = (JSONArray) object.get("rows");
-            for (int i = 0; i < stat.size(); i++) {
-                JSONObject obj = (JSONObject) stat.get(i);
-                String mainJob = (String) obj.get("jobName");
-                Job entity = this.jobRepository.findByJobName(mainJob);
+        JSONArray stat = (JSONArray) object.get("rows");
+        for (int i = 0; i < stat.size(); i++) {
+            JSONObject obj = (JSONObject) stat.get(i);
+            String mainJob = (String) obj.get("jobName");
+            Job entity = this.jobRepository.findByJobName(mainJob);
 
-                if (entity == null) {
-                    throw new BusinessException("");
-                }
-
-                JSONArray childJob = (JSONArray) obj.get("rows");
-                for (int j = 0; j < childJob.size(); j++) {
-                    jobDetail = new JobDetail();
-                    jobDetail.setJobValue(entity.getJobValue());
-                    JSONObject obj2 = (JSONObject) childJob.get(j);
-                    jobDetail.setFirstJob((String) obj2.get("jobGrowName"));
-                    //String firstId = (String) obj2.get("jobGrowId");
-                    if (obj2.containsKey("next")) {
-                        JSONObject obj3 = (JSONObject) obj2.get("next");
-                        jobDetail.setSecondJob((String) obj3.get("jobGrowName"));
-                        //String secondId = (String) obj3.get("jobGrowId");
-                        if (obj3.containsKey("next")) {
-                            JSONObject obj4 = (JSONObject) obj3.get("next");
-                            jobDetail.setThirdJob((String) obj4.get("jobGrowName"));
-                            //String thirdId = (String) obj4.get("jobGrowId");
-                            if (obj4.containsKey("next")) {
-                                JSONObject obj5 = (JSONObject) obj4.get("next");
-                                jobDetail.setFourthJob((String) obj5.get("jobGrowName"));
-                                //String fourthId = (String) obj5.get("jobGrowId");
-                            }
-                        }
-                    }
-
-                    list.add(jobDetail);
-                }
+            if (entity == null) {
+                throw new BusinessException("");
             }
 
-            this.jobDetailRepository.saveAll(list);
-        } catch (ParseException e) {
-            throw new BusinessException(e.getMessage());
+            JSONArray childJob = (JSONArray) obj.get("rows");
+            for (int j = 0; j < childJob.size(); j++) {
+                jobDetail = new JobDetail();
+                jobDetail.setJobValue(entity.getJobValue());
+                JSONObject obj2 = (JSONObject) childJob.get(j);
+                jobDetail.setFirstJob((String) obj2.get("jobGrowName"));
+                //String firstId = (String) obj2.get("jobGrowId");
+                if (obj2.containsKey("next")) {
+                    JSONObject obj3 = (JSONObject) obj2.get("next");
+                    jobDetail.setSecondJob((String) obj3.get("jobGrowName"));
+                    //String secondId = (String) obj3.get("jobGrowId");
+                    if (obj3.containsKey("next")) {
+                        JSONObject obj4 = (JSONObject) obj3.get("next");
+                        jobDetail.setThirdJob((String) obj4.get("jobGrowName"));
+                        //String thirdId = (String) obj4.get("jobGrowId");
+                        if (obj4.containsKey("next")) {
+                            JSONObject obj5 = (JSONObject) obj4.get("next");
+                            jobDetail.setFourthJob((String) obj5.get("jobGrowName"));
+                            //String fourthId = (String) obj5.get("jobGrowId");
+                        }
+                    }
+                }
+
+                list.add(jobDetail);
+            }
         }
+
+        this.jobDetailRepository.saveAll(list);
     }
 
     /**
@@ -227,6 +221,23 @@ public class AdminService {
     	this.emblemRepository.saveAll(ObjectMapperUtils.mapList(emblemList, Emblem.class));
     }
     
+    // talisman
     
+    
+    // https://dundam.xyz/newVer/dealerRanking.jsp?page=0&type=4&job=%E7%9C%9E%20%EC%9B%A8%ED%8E%80%EB%A7%88%EC%8A%A4%ED%84%B0&baseJob=%EA%B7%80%EA%B2%80%EC%82%AC(%EB%82%A8)&weaponType=%EC%A0%84%EC%B2%B4
+    // page 0 ->
+    // type 4 고정
+    // job
+    // baseJob 외전
+    // weaponType 전체
+    // .image class characterid
+    
+    public void test() {
+    	List<JobDetail> list = this.jobDetailRepository.findAll();
+    	List<JobDetailDto> list2 = ObjectMapperUtils.mapList(list, JobDetailDto.class);
+    	String a = "";
+    	String b = "";
+    	
+    }
     
 }

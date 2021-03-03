@@ -17,6 +17,7 @@ import xyz.dunshow.annotation.LoginUser;
 import xyz.dunshow.constants.ErrorMessage;
 import xyz.dunshow.constants.UserRole;
 import xyz.dunshow.dto.AjaxResponse;
+import xyz.dunshow.dto.InfoDto;
 import xyz.dunshow.dto.UserSession;
 import xyz.dunshow.exception.BusinessException;
 import xyz.dunshow.exception.PageException;
@@ -81,6 +82,8 @@ public class AdminController {
 			
 		} else if ("ioIdInsert".equals(target)) {
 			this.openApiService.ioIdInsert();
+		} else if ("testCase".equals(target)) {
+			this.adminService.test();
 		}
 		
         
@@ -95,7 +98,7 @@ public class AdminController {
 	public AjaxResponse charIdTest(String server, String name) {
 		Map<String, Object> map = Maps.newHashMap();
 		
-		List<String> list = this.openApiService.getCharacterId(server, name, "50");
+		List<InfoDto> list = this.openApiService.getCharacterId(server, name, "50");
 		
 		map.put("data", list);
 		

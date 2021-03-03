@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import xyz.dunshow.constants.ApiKey;
 import xyz.dunshow.constants.Server;
 import xyz.dunshow.dto.EnumCode;
+import xyz.dunshow.dto.InfoDto;
 import xyz.dunshow.entity.ShowRoom;
 import xyz.dunshow.exception.BusinessException;
 import xyz.dunshow.repository.ShowRoomRepository;
@@ -38,11 +39,13 @@ public class OpenApiService {
 
 	private final EnumCodeUtil enumCodeUtil;
 
+	private final JSONParser parse = new JSONParser();
+	
     /**
      *  각 직업조회
      * @return
      */
-    public String getJobs() {
+    public JSONObject getJobs() {
         StringBuilder sb = new StringBuilder();
         sb.append(ApiKey.NEOPLE_API_URL);
         sb.append("jobs?apikey=");
@@ -72,9 +75,9 @@ public class OpenApiService {
      *  아이템 검색
      * @param itemName
      * @param wordType(default-match) 동일 단어(match), 앞 단어 검색(front), 전문 검색(full)
-     * https://api.neople.co.kr/df/items?itemName=<itemName>&wordType=<wordType>&q=minLevel:<minLevel>,maxLevel:<maxLevel>,rarity:<rarity>&limit=<limit>&apikey=OLejPB3xs8EIqMVrvRNOrYp1eY3UD8oP
+     * https://api.neople.co.kr/df/items?itemName=<itemName>&wordType=<wordType>&q=minLevel:<minLevel>,maxLevel:<maxLevel>,rarity:<rarity>&limit=<limit>&apikey=
      */
-    public String getItemSearch(String itemName, String wordType) {
+    public JSONObject getItemSearch(String itemName, String wordType) {
     	if (StringUtils.isEmpty(wordType)) {
     		wordType = "match";
     	}
@@ -97,7 +100,7 @@ public class OpenApiService {
      * @param limit default 10 max 400
      * @return
      */
-    public String getAuction(String itemId, String itemName, String limit) {
+    public JSONObject getAuction(String itemId, String itemName, String limit) {
     	if (StringUtils.isEmpty(itemId) && StringUtils.isEmpty(itemName)) {
     		throw new BusinessException("필수값이 누락되었습니다.");
     	}
@@ -130,7 +133,7 @@ public class OpenApiService {
      * @param limit default 10 max 100
      * @return
      */
-    public String getAuctionSold(String itemId, String itemName, String limit) {
+    public JSONObject getAuctionSold(String itemId, String itemName, String limit) {
     	if (StringUtils.isEmpty(itemId) && StringUtils.isEmpty(itemName)) {
     		throw new BusinessException("필수값이 누락되었습니다.");
     	}
@@ -162,8 +165,8 @@ public class OpenApiService {
      * @param limit min 10 max 200
      * @return
      */
-    public List<String> getCharacterId(String server, String name, String limit) {
-    	if (StringUtils.isEmpty(enumCodeUtil.get(Server.CODE, server))) {
+    public List<InfoDto> getCharacterId(String server, String name, String limit) {
+    	if (StringUtils.isEmpty(this.enumCodeUtil.get(Server.CODE, server))) {
     		throw new BusinessException("서버 선택이 잘못되었습니다.");
     	}
     	if (StringUtils.isEmpty(name)) {
@@ -181,18 +184,21 @@ public class OpenApiService {
         sb.append("&apikey=");
         sb.append(ApiKey.NEOPLE_API_KEY);
         
-        String rs = this.callApi(sb.toString());
-        JSONParser parse = new JSONParser();
-        List<String> list = Lists.newArrayList();
-        try {
-			JSONObject obj = (JSONObject)parse.parse(rs);
-			JSONArray jsonArr = (JSONArray) obj.get("rows");
-			for (int i = 0; i < jsonArr.size(); i++) {
-				JSONObject obj2 = (JSONObject) jsonArr.get(i);
-				list.add(obj2.get("characterId").toString());
-			}
-		} catch (ParseException e) {
-			throw new BusinessException("파싱 에러");
+        JSONObject obj = this.callApi(sb.toString());
+        List<InfoDto> list = Lists.newArrayList();
+        InfoDto info;
+		JSONArray jsonArr = (JSONArray) obj.get("rows");
+		for (int i = 0; i < jsonArr.size(); i++) {
+			info = new InfoDto();
+			JSONObject obj2 = (JSONObject) jsonArr.get(i);
+			info.setCharacterId(obj2.get("characterId").toString());
+			info.setCharacterName(obj2.get("characterName").toString());
+			info.setJobGrowName(obj2.get("jobGrowName").toString());
+			info.setServerName(this.enumCodeUtil.get(Server.CODE, obj2.get("serverId").toString()));
+			info.setServerId(obj2.get("serverId").toString());
+			info.setImgSrc("https://img-api.neople.co.kr/df/servers/" + info.getServerId() +"/characters/"+ info.getCharacterId() + "?zoom=1");
+			
+			list.add(info);
 		}
         
         return list;
@@ -207,7 +213,7 @@ public class OpenApiService {
      * @param limit
      * @return
      */
-    public String getMarket(String title, String emblemCode, String rarity, String jobId, String limit) {
+    public JSONObject getMarket(String title, String emblemCode, String rarity, String jobId, String limit) {
         
         StringBuilder sb = new StringBuilder();
         sb.append(ApiKey.NEOPLE_API_URL);
@@ -225,17 +231,47 @@ public class OpenApiService {
         sb.append("&apikey=");
         sb.append(ApiKey.NEOPLE_API_KEY);
         
-        String rs = this.callApi(sb.toString());
-        
-        return "";
+        return this.callApi(sb.toString());
     }
 
+    
+    /**
+     *  상세 조회
+     * @param server
+     * @param characterId
+     * https://api.neople.co.kr/df/servers/<server>/characters/<characterId>?apikey=
+     */
+    public JSONObject getCharacterDetail(String server, String characterId) {
+    	StringBuilder sb = new StringBuilder();
+    	sb.append(ApiKey.NEOPLE_API_URL);
+        sb.append("servers/");
+        sb.append(server);
+        sb.append("/characters/");
+        sb.append(characterId);
+        sb.append("/equip/avatar?apikey=");
+        sb.append(ApiKey.NEOPLE_API_KEY);
+        
+        return this.callApi(sb.toString());
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     // 교불 조회할때 사용할것.
     // https://api.neople.co.kr/df/auction?itemName=[마창사]&wordType=full&sort=unitPrice:asc&q=rarity:레어,maxLevel:1&apikey=OLejPB3xs8EIqMVrvRNOrYp1eY3UD8oP
-    public String callApi(String requestUrl) {
+    public JSONObject callApi(String requestUrl) {
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
-
+        JSONObject obj;
         try {
             URL url = new URL(requestUrl);
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
@@ -246,6 +282,8 @@ public class OpenApiService {
             while((line = br.readLine()) != null) {
                 sb.append(line);
             }
+
+            obj = (JSONObject)this.parse.parse(sb.toString());
         } catch (Exception e) {
             throw new BusinessException("API 응답 에러");
         } finally {
@@ -258,47 +296,59 @@ public class OpenApiService {
             }
         }
 
-        return sb.toString();
+        return obj;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     private final ShowRoomRepository showRoomRepository;
     @Transactional
     public void ioIdInsert() {
-        List<ShowRoom> entity = this.showRoomRepository.findAll();
-        StringBuilder sb = new StringBuilder();
-
-        for (ShowRoom s : entity) {
-            sb.setLength(0);
-            sb.append(ApiKey.NEOPLE_API_URL);
-            sb.append("items?itemName=");
-            sb.append(EncodeUtil.encodeURIComponent(s.getAvatarName()));
-            sb.append("&apikey=");
-            sb.append(ApiKey.NEOPLE_API_KEY);
-            String rs = callApi(sb.toString());
-
-            JSONParser parse = new JSONParser();
-            JSONObject object;
-            sb.setLength(0);
-            try {
-                object = (JSONObject) parse.parse(rs);
-                JSONArray stat = (JSONArray) object.get("rows");
-                if (!stat.isEmpty()) {
-                    for (int i = 0; i < stat.size(); i++) {
-                        JSONObject obj = (JSONObject) stat.get(i);
-                        sb.append(obj.get("itemRarity"));
-                        if (i != (stat.size() -1) ) { sb.append(","); }
-                    }
-                    s.setRarity(sb.toString());
-                    System.out.println("Insert 완료 : " + sb.toString());
-                }
-
-            } catch (ParseException e) {
-                System.out.println(sb.toString());
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-        }
+//        List<ShowRoom> entity = this.showRoomRepository.findAll();
+//        StringBuilder sb = new StringBuilder();
+//
+//        for (ShowRoom s : entity) {
+//            sb.setLength(0);
+//            sb.append(ApiKey.NEOPLE_API_URL);
+//            sb.append("items?itemName=");
+//            sb.append(EncodeUtil.encodeURIComponent(s.getAvatarName()));
+//            sb.append("&apikey=");
+//            sb.append(ApiKey.NEOPLE_API_KEY);
+//            String rs = callApi(sb.toString());
+//
+//            JSONParser parse = new JSONParser();
+//            JSONObject object;
+//            sb.setLength(0);
+//            try {
+//                object = (JSONObject) parse.parse(rs);
+//                JSONArray stat = (JSONArray) object.get("rows");
+//                if (!stat.isEmpty()) {
+//                    for (int i = 0; i < stat.size(); i++) {
+//                        JSONObject obj = (JSONObject) stat.get(i);
+//                        sb.append(obj.get("itemRarity"));
+//                        if (i != (stat.size() -1) ) { sb.append(","); }
+//                    }
+//                    s.setRarity(sb.toString());
+//                    System.out.println("Insert 완료 : " + sb.toString());
+//                }
+//
+//            } catch (ParseException e) {
+//                System.out.println(sb.toString());
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//
+//        }
     }
 }
