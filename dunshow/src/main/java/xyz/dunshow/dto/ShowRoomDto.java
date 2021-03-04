@@ -17,7 +17,7 @@ public class ShowRoomDto extends BaseDto {
     private int showRoomSeq;
     private String avatarName;
     private String previewIndex;
-    private String jobSeq;
+    private String jobValue;
     private String partsName;
     private String itemId;
     private String rarity;

@@ -13,81 +13,72 @@
 					<div class="card-body text-center">
 						<img src="http://avatarsync.df.nexon.com/wear/image/stand@2x.png?wearInfo=%7B%22job%22:%220%22,%22level%22:0,%22hair%22:null,%22cap%22:null,%22face%22:null,%22neck%22:null,%22coat%22:null,%22belt%22:null,%22pants%22:null,%22shoes%22:null,%22skin%22:null,%22weapon1%22:null,%22package%22:null,%22animation%22:%22Stand%22%7D" alt="Christina Mason" class="img-fluid mb-2" width="300" height="345" id="targetImage">
 					<div>
+						<a class="btn btn-primary btn-sm" href="#" onclick="prevAvatar();">이전</a>
 						<a class="btn btn-primary btn-sm" href="#" onclick="randomAvatar();">랜덤 아바타</a>
-						<a class="btn btn-primary btn-sm" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> 초기화</a>
+						<a class="btn btn-primary btn-sm" href="#" onclick="getAuction();"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>경매장 조회</a>
+						<a class="btn btn-primary btn-sm" href="#" onclick="nextAvatar();">다음</a>
 					</div>
+					<hr class="my-3 showDetail" style="display:none;">
+					<div class="card-body showDetail" style="display:none;">
+					<h5 class="h6 card-title"><i class="align-middle mr-1" data-feather="trending-down"></i>가격정보</h5>
+					<ul class="list-unstyled mb-0">
+						<li class="mb-1" id="totalPrice"></li>
+						<li class="mb-1" id="totalAverage"></li>
+					</ul>
 					</div>
-					<hr class="my-0">
-					<div class="card-body">
-						<h5 class="h6 card-title">Skills</h5>
-						
-						<a href="#" class="badge bg-primary mr-1 my-1">HTML</a>
-						<a href="#" class="badge bg-primary mr-1 my-1">JavaScript</a>
-						<a href="#" class="badge bg-primary mr-1 my-1">Sass</a>
-						<a href="#" class="badge bg-primary mr-1 my-1">Angular</a>
-						<a href="#" class="badge bg-primary mr-1 my-1">Vue</a>
-						<a href="#" class="badge bg-primary mr-1 my-1">React</a>
-						<a href="#" class="badge bg-primary mr-1 my-1">Redux</a>
-						<a href="#" class="badge bg-primary mr-1 my-1">UI</a>
-						<a href="#" class="badge bg-primary mr-1 my-1">UX</a>
-					</div>
-					<hr class="my-0">
-					<div class="card-body">
-						<h5 class="h6 card-title">About</h5>
-						<ul class="list-unstyled mb-0">
-							<li class="mb-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home feather-sm mr-1"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Lives in <a href="#">San Francisco, SA</a></li>
-
-							<li class="mb-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase feather-sm mr-1"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> Works at <a href="#">GitHub</a></li>
-							<li class="mb-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin feather-sm mr-1"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> From <a href="#">Boston</a></li>
-						</ul>
-					</div>
-					<hr class="my-0">
-					<div class="card-body">
-						<h5 class="h6 card-title">Elsewhere</h5>
-						<ul class="list-unstyled mb-0">
-							<li class="mb-1"><span class="fas fa-globe fa-fw mr-1"></span> <a href="#">staciehall.co</a></li>
-							<li class="mb-1"><span class="fab fa-twitter fa-fw mr-1"></span> <a href="#">Twitter</a></li>
-							<li class="mb-1"><span class="fab fa-facebook fa-fw mr-1"></span> <a href="#">Facebook</a></li>
-							<li class="mb-1"><span class="fab fa-instagram fa-fw mr-1"></span> <a href="#">Instagram</a></li>
-							<li class="mb-1"><span class="fab fa-linkedin fa-fw mr-1"></span> <a href="#">LinkedIn</a></li>
-						</ul>
 					</div>
 				</div>
 			</div>
-						
-						
-						
-						
-						
 									
 						<div class="col-md-5 col-xl-7">
-						<div class="tab-content">
-							<th:block th:each="item : ${jobList}">
-								<div th:attr="class=((${item.jobValue} == 0) ? 'tab-pane fade active show' : 'tab-pane fade'), id='target_' + ${item.jobValue}" role="tabpanel">
-										<div class="card">
-											<div class="card-header">
-													<ul class="nav nav-pills card-header-pills pull-right" role="tablist">
-														<th:block th:each="parts : ${partsList}">
-															<li class="nav-item">
-																<a data-toggle="tab" th:attr="class=((${parts.partsSeq}) == 0 ? 'nav-link active' : 'nav-link'),href='#parts_' + ${parts.partsSeq} + '_job_' + ${item.jobValue}" th:text="${parts.partsKorName}"></a>
-															</li>
-														</th:block>
-													</ul>
-											</div>
-											<div class="card-body">
-												<div class="tab-content">
-													<th:block th:each="parts : ${partsList}">
-														<div th:attr="class=((${parts.partsSeq}) == 0 ? 'tab-pane fade active show' : 'tab-pane fade'),id='parts_' + ${parts.partsSeq} + '_job_' + ${item.jobValue}" role="tabpanel">
-														</div>
-													<th:block th:each="parts : ${partsList}">
-												</div>
-											</div>
-										</div>
-								</div>
-							</th:block>
-								
-								
+						
+						<div class="card mb-3">
+					<div class="card-header">
+						<h5 class="card-title mb-0">아바타 상세정보</h5>
+						<div class="text-sm text-muted p-2 mt-1">
+							▶ 교환불가란 (경매장에 등록되어 있지 않고 최근거래내역이 없으면 교환불가 처리)</br>
+							▶ 평균가만 존재하는 경우 (경매장에 등록된 상품이 없으면 최근 거래내역 조회 후 N건의 평균값 - 최대 10건)</br>
+							▶ 최저가 합계 = 부위별 최저가 합계 + 평균가 (등록된 상품이 없는경우)
 						</div>
+					</div>
+					
+					<hr class="my-0 showDetail" style="display:none;">
+					<div class="card-body showDetail" style="display:none;">
+						<ul class="list-unstyled mb-0" id="avatarInfo">
+							
+						</ul>
+					</div>
+				</div>
+				
+				
+				<!-- 부위별 토글 -->
+<!-- 						<div class="tab-content"> -->
+<!-- 							<th:block th:each="item : ${jobList}"> -->
+<!-- 								<div th:attr="class=((${item.jobValue} == 0) ? 'tab-pane fade active show' : 'tab-pane fade'), id='target_' + ${item.jobValue}" role="tabpanel"> -->
+<!-- 										<div class="card"> -->
+<!-- 											<div class="card-header"> -->
+<!-- 													<ul class="nav nav-pills card-header-pills pull-right" role="tablist"> -->
+<!-- 														<th:block th:each="parts : ${partsList}"> -->
+<!-- 															<li class="nav-item"> -->
+<!-- 																<a data-toggle="tab" th:attr="class=((${parts.partsSeq}) == 0 ? 'nav-link active' : 'nav-link'),href='#parts_' + ${parts.partsSeq} + '_job_' + ${item.jobValue}" th:text="${parts.partsKorName}"></a> -->
+<!-- 															</li> -->
+<!-- 														</th:block> -->
+<!-- 													</ul> -->
+<!-- 											</div> -->
+<!-- 											<div class="card-body"> -->
+<!-- 												<div class="tab-content"> -->
+<!-- 													<th:block th:each="parts : ${partsList}"> -->
+<!-- 														<div th:attr="class=((${parts.partsSeq}) == 0 ? 'tab-pane fade active show' : 'tab-pane fade'),id='parts_' + ${parts.partsSeq} + '_job_' + ${item.jobValue}" role="tabpanel"> -->
+<!-- 														</div> -->
+<!-- 													<th:block th:each="parts : ${partsList}"> -->
+<!-- 												</div> -->
+<!-- 											</div> -->
+<!-- 										</div> -->
+<!-- 								</div> -->
+<!-- 							</th:block> -->
+								
+								
+<!-- 						</div> -->
 						</div>
 						
 						<div class="col-md-3 col-xl-2">
@@ -120,6 +111,9 @@
     function initData(jobSeq) {
     	show.data = {};
     	show.data.parts = {};
+    	show.prev = {};
+    	show.prev.choice = [];
+    	show.prev.src = [];
     	
 	    $.ajax({
 			url : '/avatar/data.ajax',
@@ -179,20 +173,60 @@
     	});
     	
     	$('#targetImage').attr('src', imgSrc + encodeURI(JSON.stringify(wearInfo)));
+    	
+    	show.prev.choice.push(show.param.choice);
+    	show.prev.src.push($('#targetImage').attr('src'));
+    	totalLen = show.prev.choice.length;
+    	currIdx = totalLen - 2;
+//     	currLen = show.prev.choice.length - 1;
     }
     
     function getAuction() {
+    	if (!show.param) {
+    		alert('조회할 아바타가 없습니다.');
+    		return false;
+    	}
+
     	$.ajax({
 			url : '/avatar/showroom/getAuction.ajax',
 			type : 'POST',
 			contentType: 'application/json; charset=utf-8',
 			data : JSON.stringify(show.param),
 			success : function(res) {
-				console.log(res);
+				$('#avatarInfo').children().remove();
+				$('#totalPrice').text(res.data.totalPrice);
+				$('#totalAverage').text(res.data.totalAverage);
+				var text = [];
+				$.each(res.data.data, function(index, item) {
+					text.push('<li class="mb-1">');
+					text.push('<strong>' + item.itemName + '</strong></br>');
+					text.push('최저가 : ' + item.unitPrice + '</br>');
+					text.push('평균가 : ' + item.averagePrice);
+					text.push('</li><hr class="my-0">');
+				});
+				
+				$('#avatarInfo').append(text.join(''));
+				$('.showDetail').show();
 			}
 		});
     }
     
+//     var totalLen = 0;
+//     var currIdx = -1;
+//     function prevAvatar() {
+//     	console.log(currIdx);
+//     	if (currIdx <= 0) { alert('첫페이지'); return false; }
+//     	currIdx--;
+//     	show.param.choice = show.prev.choice[currIdx]; 
+//     	$('#targetImage').attr('src', show.prev.src[currIdx]);
+//     }
+//     function nextAvatar() {
+//     	if ((currIdx + 1) == totalLen) {alert('마지막페이지입니다.');  return false; }
+//     	if (currIdx < 0) { currIdx = 0; }
+//     	currIdx++;
+//     	show.param.choice = show.prev.choice[currIdx]; 
+//     	$('#targetImage').attr('src', show.prev.src[currIdx]);
+//     }
     </script>
 </th:block>
 

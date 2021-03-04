@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +35,7 @@ import com.google.common.collect.Maps;
 
 import lombok.RequiredArgsConstructor;
 import xyz.dunshow.constants.ApiKey;
+import xyz.dunshow.dto.EmblemDto;
 import xyz.dunshow.dto.InfoDto;
 import xyz.dunshow.dto.JobDetailDto;
 import xyz.dunshow.dto.ShowRoomDto;
@@ -71,6 +73,66 @@ public class AdminService {
     private final JobDetailMapper jobDetailMapper;
     
     private final RankDataRepository rankdataRepository;
+    
+    private final List<String> buff = Arrays.asList(
+            "오버드라이브",
+            "잔영의 케이가",
+            "폭주",
+            "살의의 파동",
+            "귀혼일체",
+            "신검합일",
+            "광폭화",
+            "오기조원",
+            "컨제스트",
+            "역혈기공",
+            "강권",
+            "뒷골목 싸움법",
+            "반드시 잡는다!",
+            "카이",
+            "독 바르기",
+            "데스 바이 리볼버",
+            "미라클 비전",
+            "로보틱스",
+            "오버 차지",
+            "마나 폭주",
+            "공명",
+            "윈드니스",
+            "블러드 번",
+            "경계망상",
+            "엘레멘탈 번",
+            "고대의 도서관",
+            "환수 폭주",
+            "전장의 여신",
+            "금단의 저주",
+            "영광의 축복",
+            "성령의 메이스",
+            "섀도우 박서",
+            "추락하는 영혼",
+            "열정의 챠크라",
+            "광명의 챠크라",
+            "용맹의 축복",
+            "광적인 믿음",
+            "신탁의 기원",
+            "일곱개의 대죄",
+            "셰이크 다운",
+            "암흑의 의식",
+            "화둔:홍염",
+            "암살자의 마음가짐",
+            "워크라이",
+            "브레인 스톰",
+            "페이스풀",
+            "폭음폭식",
+            "마창 해방",
+            "오러 랜스",
+            "마나 익스트랙트",
+            "다크니스",
+            "증폭",
+            "오버플로우",
+            "임무 시작",
+            "역전의 승부사",
+            "전술 지휘",
+            "코어 프렉시스"
+            );
 
     /**
      *  showroom data 초기화
@@ -95,7 +157,7 @@ public class AdminService {
                 room.setItemId(arr[1]);
                 room.setPartsName(arr[2]);
                 room.setPreviewIndex(arr[3]);
-                room.setJobSeq(arr[4]);
+                room.setJobValue(arr[4]);
                 room.setRarity(arr[5]);
 
                 this.showRoomRepository.save(room.toEntity(ShowRoom.class));
@@ -130,7 +192,7 @@ public class AdminService {
                 br.append("▦");
                 br.append(s.getPreviewIndex());
                 br.append("▦");
-                br.append(s.getJobSeq());
+                br.append(s.getJobValue());
                 br.append("▦");
                 br.append(s.getRarity());
                 br.newLine();
@@ -195,6 +257,74 @@ public class AdminService {
     }
 
     /**
+     *  emblem data 초기화
+     */
+    @Transactional
+    public void initEmblemData() {
+        ClassPathResource resource = new ClassPathResource("static/initData/emblem.txt");
+
+        try {
+            this.emblemRepository.deleteAll();
+            Path path = Paths.get(resource.getURI());
+            List<String> content = Files.readAllLines(path);
+            String[] arr;
+            EmblemDto emblem;
+
+            
+
+            for (String s : content) {
+                arr = s.split("▦");
+                emblem = new EmblemDto();
+                emblem.setBuffYn(arr[0]);
+                emblem.setEmblemId(arr[1]);
+                emblem.setEmblemName(arr[2]);
+                emblem.setJobDetailSeq(Integer.parseInt(arr[3]));
+                emblem.setRate(arr[4]);
+
+                this.emblemRepository.save(emblem.toEntity(Emblem.class));
+            }
+
+        } catch (Exception e) {
+            throw new BusinessException(e.getMessage());
+        }
+    }
+
+    /**
+     *  emblem 테이블에 있는 data 백업
+     */
+    public void bakEmblemData() {
+        List<Emblem> entity = this.emblemRepository.findAll();
+        if (entity == null) {
+            throw new BusinessException("추출할 데이터가 없습니다.");
+        }
+
+        ClassPathResource resource = new ClassPathResource("static/initData/emblem.txt");
+
+        try {
+            Path path = Paths.get(resource.getURI());
+            BufferedWriter br = new BufferedWriter(new FileWriter(path.toString(), false));
+
+            for (Emblem s : entity) {
+                br.append(s.getBuffYn());
+                br.append("▦");
+                br.append(s.getEmblemId());
+                br.append("▦");
+                br.append(s.getEmblemName());
+                br.append("▦");
+                br.append(s.getJobDetailSeq()+"");
+                br.append("▦");
+                br.append(s.getRate());
+                br.newLine();
+            }
+
+            br.flush();
+            br.close();
+        } catch (Exception e) {
+            throw new BusinessException(e.getMessage());
+        }
+    }
+    
+    /**
      *  dnfnow emblem 조회 후 저장
      */
     @Transactional
@@ -214,7 +344,7 @@ public class AdminService {
     		} else if ("10".equals(j.getJobValue())) {
     			sb.append(EncodeUtil.encodeURIComponent("크리에이터"));
     		} else {
-    			sb.append(EncodeUtil.encodeURIComponent(j.getFirstJob()));
+    			sb.append(EncodeUtil.encodeURIComponent(j.getSecondJob()));
     		}
     		
     		doc = this.openApiService.getJsoupConnect(sb.toString());
@@ -227,7 +357,14 @@ public class AdminService {
     			emblem.setEmblemId(e2.attr("onclick").substring(30).replace("'", ""));
     			emblem.setEmblemName(e2.text().trim());
     			emblem.setJobDetailSeq(j.getJobDetailSeq());
-    			emblem.setBuffYn("N");
+    			for (String s : this.buff) {
+    			    if (emblem.getEmblemName().contains(s)) {
+    			        emblem.setBuffYn("Y");
+    			        break;
+    			    }
+    			    emblem.setBuffYn("N");
+    			}
+    			
     			emblemList.add(emblem);
     		}
     	}
@@ -251,11 +388,6 @@ public class AdminService {
     	StringBuilder sb = new StringBuilder();
     	this.rankdataRepository.deleteAll();
     	RankData rank;
-    	ClassPathResource resource = new ClassPathResource("static/initData/rank.txt");
-
-        try {
-            Path path = Paths.get(resource.getURI());
-            BufferedWriter br = new BufferedWriter(new FileWriter(path.toString(), false));
 
     	for (JobDetailDto j : list) {
     		List<RankData> rankList = Lists.newArrayList();
@@ -289,24 +421,41 @@ public class AdminService {
     				rank.setJobDetailSeq(j.getJobDetailSeq());
     				System.out.println(rank.getCharacterId() + "_____" + rank.getServerId());
     				rankList.add(rank);
-    				
-    				br.append(rank.getCharacterId());
-    				br.append("▦");
-    				br.append(rank.getServerId());
-    				br.append("▦");
-    				br.append(rank.getJobDetailSeq()+"");
-                    br.newLine();
     			}
     		}
     		
     		this.rankdataRepository.saveAll(rankList);
     	}
-    	br.flush();
-        br.close();
-    } catch (Exception e) {
-        throw new BusinessException(e.getMessage());
+    	
     }
+    
+    /**
+     *  Rank Data 추출
+     */
+    public void bakRankData() {
+        ClassPathResource resource = new ClassPathResource("static/initData/rank.txt");
+        List<RankData> list = this.rankdataRepository.findAll();
+        try {
+            Path path = Paths.get(resource.getURI());
+            BufferedWriter br = new BufferedWriter(new FileWriter(path.toString(), false));
+            
+            for (RankData r : list) {
+                br.append(r.getCharacterId());
+                br.append("▦");
+                br.append(r.getServerId());
+                br.append("▦");
+                br.append(r.getJobDetailSeq()+"");
+                br.newLine();
+            }
+            
+            br.flush();
+            br.close();
+        } catch (Exception e) {
+            throw new BusinessException(e.getMessage());
+        }
     }
+    
+    
     
     /**
      *  rank data 초기화

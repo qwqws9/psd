@@ -33,7 +33,7 @@ public class ShowRoom extends BaseEntity {
 	@Column
 	private String previewIndex;
 	@Column
-	private String jobSeq;
+	private String jobValue;
 	@Column
 	private String partsName;
 	@Column

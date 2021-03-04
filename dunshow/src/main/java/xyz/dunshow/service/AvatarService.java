@@ -16,8 +16,8 @@ public class AvatarService {
 
     private final ShowRoomRepository showRoomRepository;
     
-    public List<ShowRoom> getAvatarListByJobSeq(String jobSeq) {
-        List<ShowRoom> list = this.showRoomRepository.findByJobSeq(jobSeq);
+    public List<ShowRoom> getAvatarListByJobSeq(String jobValue) {
+        List<ShowRoom> list = this.showRoomRepository.findByJobValue(jobValue);
         
 //        return ObjectMapperUtils.mapList(list, ShowRoomDto.class);
         return list;

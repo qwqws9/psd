@@ -74,10 +74,16 @@ public class AdminController {
 		} else if ("bakShowRoomData".equals(target)) {
 			this.adminService.bakShowRoomData();
 			
-		} else if ("initemblemData".equals(target)) {
+		} else if ("getEmblem".equals(target)) {
 			this.adminService.getEmblem();
 			
-		} else if ("initJobDetail".equals(target)) {
+		} else if ("initEmblemData".equals(target)) {
+            this.adminService.initEmblemData();
+            
+        } else if ("bakEmblemData".equals(target)) {
+            this.adminService.bakEmblemData();
+            
+        } else if ("initJobDetail".equals(target)) {
 			this.adminService.getJobDetail();
 			
 		} else if ("ioIdInsert".equals(target)) {
@@ -89,8 +95,11 @@ public class AdminController {
 		} else if ("initRankData".equals(target)) {
 			this.adminService.initRankData();
 			
-		} else if ("testCase".equals(target)) {
+		} else if ("testCase".equals(target)) {  // 테스트 메서드
 			this.adminService.test();
+			
+		} else if ("bakRankData".equals(target)) {
+		    this.adminService.bakRankData();
 		}
 		
         

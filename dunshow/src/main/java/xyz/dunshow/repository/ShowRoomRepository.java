@@ -8,9 +8,9 @@ import xyz.dunshow.entity.ShowRoom;
 
 public interface ShowRoomRepository extends JpaRepository<ShowRoom, Integer>{
 
-    List<ShowRoom> findByJobSeqAndPartsName(String jobSeq, String partsName);
+    List<ShowRoom> findByJobValueAndPartsName(String jobValue, String partsName);
     
-    List<ShowRoom> findByJobSeq(String jobSeq);
+    List<ShowRoom> findByJobValue(String jobValue);
     
     List<ShowRoom> findByItemIdIsNull();
     
