@@ -82,6 +82,13 @@ public class AdminController {
 			
 		} else if ("ioIdInsert".equals(target)) {
 			this.openApiService.ioIdInsert();
+			
+		} else if ("getRankByDundam".equals(target)) {
+			this.adminService.getRankByDundam();
+			
+		} else if ("initRankData".equals(target)) {
+			this.adminService.initRankData();
+			
 		} else if ("testCase".equals(target)) {
 			this.adminService.test();
 		}

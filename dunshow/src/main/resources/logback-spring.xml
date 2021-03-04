@@ -1,23 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration debug = "true">
-	<!-- Appenders -->
-	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-		<withJansi>true</withJansi>
-		<encoder>
-			<Pattern>[%d] %highlight(%-5level) [%green(%25logger{15})] - %msg %n</Pattern>
-		</encoder>
-	</appender>
-	
-	<appender name="console-infolog" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<Pattern>%d %5p %m%n</Pattern>
-		</encoder>
-	</appender>
-	
-		<logger name ="yong" level="DEBUG" appender-ref="console"/>
-		<logger name="jdbc.sqlonly" level="INFO" appender-ref="console-infolog"/>
-		<logger name="jdbc.resultsettable" level="INFO" appender-ref="console-infolog"/>
-	<root level="error">
-		<appender-ref ref="console"/>
-	</root>
+<configuration>
+
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/spring.log}" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%red([%level]) %yellow([%logger]) %white(%msg) %n %rEx{2}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SQL" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>${LOG_FILE_MAX_SIZE:-10MB}</maxFileSize>
+            <maxHistory>${LOG_FILE_MAX_HISTORY:-0}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <root level="warn">
+        <appender-ref ref="CONSOLE" />
+        <springProfile name="real">
+            <appender-ref ref="FILE" />
+        </springProfile>
+    </root>
+
+    <!-- application -->
+    <logger name="xyz.dunshow" level="debug" />
+
+    <!-- 3rd party -->
+    <logger name="org.springframework.core" level="info" />
+    <logger name="org.springframework.beans" level="info" />
+    <logger name="org.springframework.context" level="info" />
+    <logger name="org.springframework.web" level="info" />
+
+    <!-- SQL -->
+    <logger name="jdbc.sqlonly" level="debug" additivity="false">
+        <appender-ref ref="SQL" />
+    </logger>
+    <logger name="jdbc.audit" level="error" additivity="false" />
+    <logger name="jdbc.connection" level="error" additivity="false" />
+    <logger name="jdbc.resultset" level="debug" additivity="false" />
+    <logger name="jdbc.sqltiming" level="error" additivity="false" />
+
 </configuration>

@@ -142,6 +142,8 @@
     }
     
     function randomAvatar() {
+    	show.param = {};
+    	show.param.choice = [];
     	var imgSrc = 'http://avatarsync.df.nexon.com/wear/image/stand@2x.png?wearInfo=';
     	var wearInfo = {
     		'job' : '',
@@ -168,12 +170,27 @@
     	});
     	
     	$.each(show.data.parts, function(index, item) {
+    		var rst = {};
     		var ran = Math.floor(Math.random() * show.data.parts[index].length);
     		var target = show.data.parts[index][ran];
-    		wearInfo[index].index = target.previewIndex; 
+    		wearInfo[index].index = target.previewIndex;
+    		rst.itemName = target.avatarName;
+    		show.param.choice.push(rst);
     	});
     	
     	$('#targetImage').attr('src', imgSrc + encodeURI(JSON.stringify(wearInfo)));
+    }
+    
+    function getAuction() {
+    	$.ajax({
+			url : '/avatar/showroom/getAuction.ajax',
+			type : 'POST',
+			contentType: 'application/json; charset=utf-8',
+			data : JSON.stringify(show.param),
+			success : function(res) {
+				console.log(res);
+			}
+		});
     }
     
     </script>

@@ -241,7 +241,7 @@ public class OpenApiService {
      * @param characterId
      * https://api.neople.co.kr/df/servers/<server>/characters/<characterId>?apikey=
      */
-    public JSONObject getCharacterDetail(String server, String characterId) {
+    public JSONObject getEquipAvatar(String server, String characterId) {
     	StringBuilder sb = new StringBuilder();
     	sb.append(ApiKey.NEOPLE_API_URL);
         sb.append("servers/");
@@ -272,6 +272,7 @@ public class OpenApiService {
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
         JSONObject obj;
+        
         try {
             URL url = new URL(requestUrl);
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
@@ -285,7 +286,13 @@ public class OpenApiService {
 
             obj = (JSONObject)this.parse.parse(sb.toString());
         } catch (Exception e) {
-            throw new BusinessException("API 응답 에러");
+        	if (e.getMessage().contains("response code: 503")) {
+        		throw new BusinessException("서버 점검중");
+        	} else {
+        		throw new BusinessException("API 응답 에러");
+        		
+        	}
+        	
         } finally {
             if (br != null) {
                 try {
@@ -298,8 +305,6 @@ public class OpenApiService {
 
         return obj;
     }
-    
-    
     
     
     

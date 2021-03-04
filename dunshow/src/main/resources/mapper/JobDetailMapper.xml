@@ -26,28 +26,13 @@
         </collection>
     </resultMap>
     
-<!--     <select id="selectTest" resultType="BoardDto" parameterType="BoardDto"> -->
-<!--         SELECT b.*, cm.ctg_name ctg_mst_name, c.ctg_name -->
-<!--           FROM board b -->
-<!--           JOIN ctg_mst cm ON b.ctg_mst_seq = cm.ctg_mst_seq -->
-<!--           JOIN ctg c ON b.ctg_seq = c.ctg_seq -->
-<!--          WHERE cm.disp_yn = "Y" AND c.disp_yn = "Y" -->
-<!--             <if test="ctgSeq != null and ctgSeq != 0"> -->
-<!--                 AND b.ctg_seq = #{ctgSeq} -->
-<!--             </if> -->
-<!--             <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(searchKeyword)"> -->
-<!--                 AND (b.board_title LIKE CONCAT('%',#{searchKeyword},'%') -->
-<!--                  OR b.text_html LIKE CONCAT('%',#{searchKeyword},'%')) -->
-<!--             </if> -->
-<!--         ORDER BY b.board_reg_dt DESC -->
-<!--         LIMIT #{startNum} , #{pageCount} -->
-<!--     </select> -->
-
-<!--     <select id="selectBoardListCount" resultType="int"> -->
-<!--         SELECT COUNT(*) -->
-<!--           FROM board b -->
-<!--           JOIN ctg_mst cm ON b.ctg_mst_seq = cm.ctg_mst_seq -->
-<!--           JOIN ctg c ON b.ctg_seq = c.ctg_seq -->
-<!--          WHERE cm.disp_yn = "Y" AND c.disp_yn = "Y" -->
-<!--     </select> -->
+    <select id="selectJobDetailList" parameterType="JobDetailDto" resultMap="jobDetailDto">
+    	SELECT J.JOB_VALUE
+    	, J.JOB_NAME
+    	, JD.FIRST_JOB
+    	, JD.THIRD_JOB
+    	, JD.FOURTH_JOB
+    	, JD.JOB_DETAIL_SEQ
+    	FROM job j INNER JOIN job_detail jd ON j.JOB_VALUE = jd.JOB_VALUE
+    </select>
 </mapper>

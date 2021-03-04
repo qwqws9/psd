@@ -37,8 +37,8 @@ public class DataService {
             throw new BusinessException("캐릭터명을 입력해 주세요.");
         }
 
-        // 상세 조회
-        JSONObject rs = this.api.getCharacterDetail(server, characterId);
+        // equip avatar 조회
+        JSONObject rs = this.api.getEquipAvatar(server, characterId);
         if (rs.isEmpty()) {
             throw new BusinessException("정상적인 접근이 아닙니다.");
         }
@@ -73,17 +73,23 @@ public class DataService {
             list.add(look);
         }
 
-        if (CollectionUtils.isEmpty(list)) {
-            throw new PageException("입혀");
+        return getAuctionList(list);
+    }
+    
+    public Map<String, Object> getAuctionList(List<InfoDto> list) {
+    	if (CollectionUtils.isEmpty(list)) {
+            throw new BusinessException("입혀");
         }
 
         int totalPrice = 0;
         int totalAverage = 0;
+        JSONObject rs;
+        JSONArray jsonArr;
         DecimalFormat format = new DecimalFormat("###,###");
 
         for (InfoDto i : list) {
             // 가격 조회
-            rs = this.api.getAuction(i.getItemId(), null, "1");
+            rs = this.api.getAuction(i.getItemId(), i.getItemName(), "1");
             jsonArr = (JSONArray) rs.get("rows");
             if (!rs.get("rows").toString().trim().equals("[]")) {
                 rs = (JSONObject) jsonArr.get(0);
@@ -95,7 +101,7 @@ public class DataService {
         for (InfoDto i : list) {
             // 가격이 비었을경우 시세 조회 (최대 10건의 평균값)
             if (StringUtils.isEmpty(i.getUnitPrice())) {
-                rs = this.api.getAuctionSold(i.getItemId(), null, "10");
+                rs = this.api.getAuctionSold(i.getItemId(), i.getItemName(), "10");
                 Long price = 0L;
                 int count = 0;
                 jsonArr = (JSONArray) rs.get("rows");
@@ -134,9 +140,18 @@ public class DataService {
         map.put("data", list);
         map.put("totalPrice", "최저가 합계 : " + format.format(totalPrice) + " 골드");
         map.put("totalAverage", "평균가 합계 : " + format.format(totalAverage) + " 골드");
-
+        
         return map;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     

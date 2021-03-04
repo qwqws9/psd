@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,6 +21,7 @@ import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import xyz.dunshow.dto.AjaxResponse;
 import xyz.dunshow.dto.InfoDto;
+import xyz.dunshow.dto.SubmitDto;
 import xyz.dunshow.entity.ShowRoom;
 import xyz.dunshow.exception.BusinessException;
 import xyz.dunshow.service.AvatarService;
@@ -62,12 +64,8 @@ public class AvatarController {
             throw new BusinessException("직업 선택이 잘못 되었습니다.");
         }
         
-        if ("9".equals(jobSeq)) {
-            jobSeq = "0";
-        }
-        if ("10".equals(jobSeq)) {
-            jobSeq = "3";
-        }
+        if ("9".equals(jobSeq)) { jobSeq = "0"; }
+        if ("10".equals(jobSeq)) { jobSeq = "3"; }
         
         Map<String, Object> map = Maps.newHashMap();
         
@@ -77,6 +75,17 @@ public class AvatarController {
         map.put("data", dtoList);
         
         return new AjaxResponse(map);
+    }
+    
+    @PostMapping("/showroom/getAuction.ajax")
+    @ResponseBody
+    @JsonView(Views.Simple.class)
+    public AjaxResponse test1(@RequestBody SubmitDto param) {
+    	if (param == null || CollectionUtils.isEmpty(param.getChoice()) || param.getChoice().size() > 9) {
+    		throw new BusinessException("파라미터 오류");
+    	}
+
+    	return new AjaxResponse(this.dataService.getAuctionList(param.getChoice()));
     }
     
     @GetMapping("/search/list")
