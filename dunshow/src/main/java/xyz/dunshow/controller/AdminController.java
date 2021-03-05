@@ -30,94 +30,90 @@ import xyz.dunshow.view.Views;
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminController {
-    
+
     private final JobService jobService;
-    
+
     private final AdminService adminService;
-    
+
     private final OpenApiService openApiService;
-    
-	@GetMapping("/dataManage")
+
+    @GetMapping("/dataManage")
     public String main(Model model, @LoginUser UserSession userSession) {
-	    if (!UserRole.ADMIN.getValue().equals(userSession.getRole())) {
-	        throw new PageException("권한이 없습니다.");
-	    }
-	    
-	    model.addAttribute("jobList", this.jobService.getJobList());
-	    
-	    
+        if (!UserRole.ADMIN.getValue().equals(userSession.getRole())) {
+            throw new PageException("권한이 없습니다.");
+        }
+
+        model.addAttribute("jobList", this.jobService.getJobList());
+
         return "admin/dataManage";
     }
-	
-	@GetMapping("/data.ajax")
-	@ResponseBody
-	@JsonView(Views.Simple.class)
-	public AjaxResponse data() {
-	    Map<String, Object> map = Maps.newHashMap();
-	    
-	    map.put("data", this.jobService.getJobList());
-	    
-	    return new AjaxResponse(map);
-	}
-	
-	@GetMapping("/dataManage.ajax")
+
+    @GetMapping("/data.ajax")
+    @ResponseBody
+    @JsonView(Views.Simple.class)
+    public AjaxResponse data() {
+        Map<String, Object> map = Maps.newHashMap();
+
+        return new AjaxResponse(map);
+    }
+
+    @GetMapping("/dataManage.ajax")
     @ResponseBody
     @JsonView(Views.Simple.class)
     public AjaxResponse dataManage(String target, @LoginUser UserSession userSession) {
-		if (!UserRole.ADMIN.getValue().equals(userSession.getRole())) {
-			throw new BusinessException(ErrorMessage.PERMISSION_DENIED.getMessage());
-		}
-		
-		if ("initShowRoomData".equals(target)) {
-			this.adminService.initShowRoomData();
-			
-		} else if ("bakShowRoomData".equals(target)) {
-			this.adminService.bakShowRoomData();
-			
-		} else if ("getEmblem".equals(target)) {
-			this.adminService.getEmblem();
-			
-		} else if ("initEmblemData".equals(target)) {
+        if (!UserRole.ADMIN.getValue().equals(userSession.getRole())) {
+            throw new BusinessException(ErrorMessage.PERMISSION_DENIED.getMessage());
+        }
+
+        if ("initShowRoomData".equals(target)) {
+            this.adminService.initShowRoomData();
+
+        } else if ("bakShowRoomData".equals(target)) {
+            this.adminService.bakShowRoomData();
+
+        } else if ("getEmblem".equals(target)) {
+            this.adminService.getEmblem();
+
+        } else if ("initEmblemData".equals(target)) {
             this.adminService.initEmblemData();
-            
+
         } else if ("bakEmblemData".equals(target)) {
             this.adminService.bakEmblemData();
-            
+
         } else if ("initJobDetail".equals(target)) {
-			this.adminService.getJobDetail();
-			
-		} else if ("ioIdInsert".equals(target)) {
-			this.openApiService.ioIdInsert();
-			
-		} else if ("getRankByDundam".equals(target)) {
-			this.adminService.getRankByDundam();
-			
-		} else if ("initRankData".equals(target)) {
-			this.adminService.initRankData();
-			
-		} else if ("testCase".equals(target)) {  // 테스트 메서드
-			this.adminService.test();
-			
-		} else if ("bakRankData".equals(target)) {
-		    this.adminService.bakRankData();
-		}
-		
-        
-        
-        
+            this.adminService.getJobDetail();
+
+        } else if ("ioIdInsert".equals(target)) {
+            this.openApiService.ioIdInsert();
+
+        } else if ("getRankByDundam".equals(target)) {
+            this.adminService.getRankByDundam();
+
+        } else if ("initRankData".equals(target)) {
+            this.adminService.initRankData();
+
+        } else if ("testCase".equals(target)) {  // 테스트 메서드
+            this.adminService.test();
+
+        } else if ("bakRankData".equals(target)) {
+            this.adminService.bakRankData();
+
+        } else if ("initOptionAndEmblemByRankData".equals(target)) {
+            this.adminService.initOptionAndEmblemByRankData();
+        }
+
         return new AjaxResponse("200", "성공");
     }
-	
-	@GetMapping("/charIdTest.ajax")
-	@ResponseBody
-	@JsonView(Views.Simple.class)
-	public AjaxResponse charIdTest(String server, String name) {
-		Map<String, Object> map = Maps.newHashMap();
-		
-		List<InfoDto> list = this.openApiService.getCharacterId(server, name, "50");
-		
-		map.put("data", list);
-		
-	    return new AjaxResponse(map);
-	}
+
+    @GetMapping("/charIdTest.ajax")
+    @ResponseBody
+    @JsonView(Views.Simple.class)
+    public AjaxResponse charIdTest(String server, String name) {
+        Map<String, Object> map = Maps.newHashMap();
+
+        List<InfoDto> list = this.openApiService.getCharacterId(server, name, "50");
+        map.put("data", list);
+
+        return new AjaxResponse(map);
+    }
 }

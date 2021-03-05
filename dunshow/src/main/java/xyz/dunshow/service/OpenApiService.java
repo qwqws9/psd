@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -15,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
@@ -25,9 +22,7 @@ import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import xyz.dunshow.constants.ApiKey;
 import xyz.dunshow.constants.Server;
-import xyz.dunshow.dto.EnumCode;
 import xyz.dunshow.dto.InfoDto;
-import xyz.dunshow.entity.ShowRoom;
 import xyz.dunshow.exception.BusinessException;
 import xyz.dunshow.repository.ShowRoomRepository;
 import xyz.dunshow.util.EncodeUtil;

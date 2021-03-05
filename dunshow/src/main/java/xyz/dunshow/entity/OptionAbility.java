@@ -11,24 +11,20 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "usr")
+@Table(name = "option_ability")
 @Getter
 @Setter
-public class User extends BaseEntity {
+public class OptionAbility extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int usrSeq;
+	private int optionAbilitySeq;
 	@Column
-	private String email;
+    private int jobDetailSeq;
 	@Column
-	private String sub;
+    private String partsName;
 	@Column
-	private String role;
-	@Column(updatable = false)
-	private String regDt;
-	@Column(length = 1)
-	private String useYn;
+    private String choiceOption;
 	@Column
-	private String lastDt;
+    private String rate;
 }

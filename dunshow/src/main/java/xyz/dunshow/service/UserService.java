@@ -2,6 +2,8 @@ package xyz.dunshow.service;
 
 import java.util.Date;
 
+import javax.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -15,20 +17,23 @@ import xyz.dunshow.util.DateUtils;
 @RequiredArgsConstructor
 public class UserService {
 
-	private final UserRepository userRepository;
-	
-	public UserDto getUserOrSaveUserBySub(UserDto dto) {
-		
-		User entity = this.userRepository.findBySub(dto.getSub());
-		
-		if (entity == null) {
-		    dto.setRole(UserRole.USER.getValue());
-			dto.setUseYn("Y");
-			dto.setRegDt(DateUtils.getDateString(new Date()));
-			if ("dunshowprice@gmail.com".equals(dto.getEmail())) { dto.setRole(UserRole.ADMIN.getValue()); }
-			entity = this.userRepository.save(dto.toEntity(User.class));
-		}
-		
-		return entity.toDto(UserDto.class);
-	}
+    private final UserRepository userRepository;
+
+    @Transactional
+    public UserDto getUserOrSaveUserBySub(UserDto dto) {
+        User entity = this.userRepository.findBySub(dto.getSub());
+
+        if (entity == null) {
+            dto.setUseYn("Y");
+            dto.setRole(UserRole.USER.getValue());
+            dto.setRegDt(DateUtils.getDateString(new Date()));
+            // 관리자계정 설정
+            if ("dunshowprice@gmail.com".equals(dto.getEmail())) { dto.setRole(UserRole.ADMIN.getValue()); }
+            entity = this.userRepository.save(dto.toEntity(User.class));
+        }
+
+        entity.setLastDt(DateUtils.getDateStringDetail(new Date()));
+
+        return entity.toDto(UserDto.class);
+    }
 }

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -36,22 +35,31 @@ import xyz.dunshow.view.Views;
 public class AvatarController {
 
     private final AvatarService avatarService;
-    
+
     private final JobService jobService;
-    
+
     private final OpenApiService openApiService;
-    
+
     private final DataService dataService;
-    
+
+    /**
+     *  showroom 페이지조회
+     * @param model
+     * @return
+     */
     @GetMapping("/showroom")
     public String test(Model model) {
-        
         model.addAttribute("jobList", this.jobService.getJobList());
         model.addAttribute("partsList", this.jobService.getPartsList());
-        
+
         return "avatar/showroom";
     }
-    
+
+    /**
+     *  avatar 정보 조회
+     * @param jobSeq
+     * @return
+     */
     @GetMapping("/data.ajax")
     @ResponseBody
     @JsonView(Views.Simple.class)
@@ -59,54 +67,73 @@ public class AvatarController {
         if (StringUtils.isEmpty(jobSeq) || !StringUtils.isNumeric(jobSeq)) {
             throw new BusinessException("직업 선택이 잘못 되었습니다.");
         }
+
         int check = Integer.parseInt(jobSeq);
         if (check < 0 || check > 15) {
             throw new BusinessException("직업 선택이 잘못 되었습니다.");
         }
-        
+
         if ("9".equals(jobSeq)) { jobSeq = "0"; }
         if ("10".equals(jobSeq)) { jobSeq = "3"; }
-        
+
         Map<String, Object> map = Maps.newHashMap();
-        
-//        List<ShowRoomDto> dtoList = this.avatarService.getAvatarListByJobSeq(jobSeq);
         List<ShowRoom> dtoList = this.avatarService.getAvatarListByJobSeq(jobSeq);
-        
         map.put("data", dtoList);
-        
+
         return new AjaxResponse(map);
     }
-    
+
+    /**
+     *  가격 조회
+     * @param param
+     * @return
+     */
     @PostMapping("/showroom/getAuction.ajax")
     @ResponseBody
     @JsonView(Views.Simple.class)
     public AjaxResponse test1(@RequestBody SubmitDto param) {
-    	if (param == null || CollectionUtils.isEmpty(param.getChoice()) || param.getChoice().size() > 9) {
-    		throw new BusinessException("파라미터 오류");
-    	}
+        if (param == null || CollectionUtils.isEmpty(param.getChoice()) || param.getChoice().size() > 9) {
+            throw new BusinessException("파라미터 오류");
+        }
 
-    	return new AjaxResponse(this.dataService.getAuctionList(param.getChoice()));
+        return new AjaxResponse(this.dataService.getAuctionList(param.getChoice()));
     }
-    
+
+    /**
+     *  캐릭터 조회
+     * @param server
+     * @param name
+     * @param model
+     * @return
+     */
     @GetMapping("/search/list")
-	public String searchList(String server, String name, Model model) {
-		List<InfoDto> list = this.openApiService.getCharacterId(server, name, "50");
-		if (CollectionUtils.isEmpty(list)) {
-			model.addAttribute("msg", "서버, 캐릭터명을 확인해 주세요.");
-		}
-		model.addAttribute("data", list);
-	    return "search/list";
-	}
-    
+    public String searchList(String server, String name, Model model) {
+        List<InfoDto> list = this.openApiService.getCharacterId(server, name, "50");
+        if (CollectionUtils.isEmpty(list)) {
+            model.addAttribute("msg", "서버, 캐릭터명을 확인해 주세요.");
+        }
+
+        model.addAttribute("data", list);
+
+        return "search/list";
+    }
+
+    /**
+     *  캐릭터 상세 조회
+     * @param serverId
+     * @param characterId
+     * @param model
+     * @return
+     */
     @RequestMapping("/search/detail/{serverId}/{characterId}")
     public String searchDetail(@PathVariable String serverId, @PathVariable String characterId, Model model) {
-    	
-    	Map<String, Object> map = this.dataService.getSearchDetail(serverId, characterId);
-    	
-    	model.addAttribute("data", map.get("data"));
-    	model.addAttribute("totalPrice", map.get("totalPrice"));
-    	model.addAttribute("totalAverage", map.get("totalAverage"));
-    	
-    	return "search/detail";
+
+        Map<String, Object> map = this.dataService.getSearchDetail(serverId, characterId);
+
+        model.addAttribute("data", map.get("data"));
+        model.addAttribute("totalPrice", map.get("totalPrice"));
+        model.addAttribute("totalAverage", map.get("totalAverage"));
+
+        return "search/detail";
     }
 }

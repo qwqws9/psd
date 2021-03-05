@@ -1,29 +1,21 @@
 package xyz.dunshow.service;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -34,14 +26,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import lombok.RequiredArgsConstructor;
-import xyz.dunshow.constants.ApiKey;
 import xyz.dunshow.dto.EmblemDto;
-import xyz.dunshow.dto.InfoDto;
 import xyz.dunshow.dto.JobDetailDto;
+import xyz.dunshow.dto.OptionAbilityDto;
 import xyz.dunshow.dto.ShowRoomDto;
 import xyz.dunshow.entity.Emblem;
 import xyz.dunshow.entity.Job;
 import xyz.dunshow.entity.JobDetail;
+import xyz.dunshow.entity.OptionAbility;
 import xyz.dunshow.entity.RankData;
 import xyz.dunshow.entity.ShowRoom;
 import xyz.dunshow.exception.BusinessException;
@@ -49,6 +41,7 @@ import xyz.dunshow.mapper.JobDetailMapper;
 import xyz.dunshow.repository.EmblemRepository;
 import xyz.dunshow.repository.JobDetailRepository;
 import xyz.dunshow.repository.JobRepository;
+import xyz.dunshow.repository.OptionAbilityRepository;
 import xyz.dunshow.repository.RankDataRepository;
 import xyz.dunshow.repository.ShowRoomRepository;
 import xyz.dunshow.util.EncodeUtil;
@@ -73,6 +66,8 @@ public class AdminService {
     private final JobDetailMapper jobDetailMapper;
     
     private final RankDataRepository rankdataRepository;
+    
+    private final OptionAbilityRepository optionAbilityRepository;
     
     private final List<String> buff = Arrays.asList(
             "오버드라이브",
@@ -210,7 +205,7 @@ public class AdminService {
      */
     @Transactional
     public void getJobDetail() {
-    	JSONObject object = this.openApiService.getJobs();
+        JSONObject object = this.openApiService.getJobs();
         this.jobDetailRepository.deleteAll();
 
         JobDetail jobDetail;
@@ -329,47 +324,47 @@ public class AdminService {
      */
     @Transactional
     public void getEmblem() {
-    	List<JobDetail> list = this.jobDetailRepository.findAll();
-    	if (list == null) { throw new BusinessException("data empty"); }
-    	this.emblemRepository.deleteAll();
-    	StringBuilder sb = new StringBuilder();
-    	Document doc = null;
-    	Emblem emblem;
-    	List<Emblem> emblemList = Lists.newArrayList();
-    	for (JobDetail j : list) {
-    		sb.setLength(0);
-    		sb.append("http://dnfnow.xyz/emblem?emblem_search=");
-    		if ("9".equals(j.getJobValue())) {
-    			sb.append(EncodeUtil.encodeURIComponent("다크나이트"));
-    		} else if ("10".equals(j.getJobValue())) {
-    			sb.append(EncodeUtil.encodeURIComponent("크리에이터"));
-    		} else {
-    			sb.append(EncodeUtil.encodeURIComponent(j.getSecondJob()));
-    		}
-    		
-    		doc = this.openApiService.getJsoupConnect(sb.toString());
-    		
-    		Elements el = doc.select("#emblemtable > tbody > tr");
-    		for (Element e : el) {
-    			Element e2 = e.selectFirst("button");
-    			if (e2 == null) { continue; }
-    			emblem = new Emblem();
-    			emblem.setEmblemId(e2.attr("onclick").substring(30).replace("'", ""));
-    			emblem.setEmblemName(e2.text().trim());
-    			emblem.setJobDetailSeq(j.getJobDetailSeq());
-    			for (String s : this.buff) {
-    			    if (emblem.getEmblemName().contains(s)) {
-    			        emblem.setBuffYn("Y");
-    			        break;
-    			    }
-    			    emblem.setBuffYn("N");
-    			}
-    			
-    			emblemList.add(emblem);
-    		}
-    	}
-    	
-    	this.emblemRepository.saveAll(ObjectMapperUtils.mapList(emblemList, Emblem.class));
+        List<JobDetail> list = this.jobDetailRepository.findAll();
+        if (CollectionUtils.isEmpty(list)) { throw new BusinessException("JobDetail data empty"); }
+        this.emblemRepository.deleteAll();
+        StringBuilder sb = new StringBuilder();
+        Document doc = null;
+        Emblem emblem;
+        List<Emblem> emblemList = Lists.newArrayList();
+        for (JobDetail j : list) {
+            sb.setLength(0);
+            sb.append("http://dnfnow.xyz/emblem?emblem_search=");
+            if ("9".equals(j.getJobValue())) {
+                sb.append(EncodeUtil.encodeURIComponent("다크나이트"));
+            } else if ("10".equals(j.getJobValue())) {
+                sb.append(EncodeUtil.encodeURIComponent("크리에이터"));
+            } else {
+                sb.append(EncodeUtil.encodeURIComponent(j.getSecondJob()));
+            }
+            
+            doc = this.openApiService.getJsoupConnect(sb.toString());
+            
+            Elements el = doc.select("#emblemtable > tbody > tr");
+            for (Element e : el) {
+                Element e2 = e.selectFirst("button");
+                if (e2 == null) { continue; }
+                emblem = new Emblem();
+                emblem.setEmblemId(e2.attr("onclick").substring(30).replace("'", ""));
+                emblem.setEmblemName(e2.text().trim());
+                emblem.setJobDetailSeq(j.getJobDetailSeq());
+                for (String s : this.buff) {
+                    if (emblem.getEmblemName().contains(s)) {
+                        emblem.setBuffYn("Y");
+                        break;
+                    }
+                    emblem.setBuffYn("N");
+                }
+                
+                emblemList.add(emblem);
+            }
+        }
+        
+        this.emblemRepository.saveAll(ObjectMapperUtils.mapList(emblemList, Emblem.class));
     }
     
     // https://dundam.xyz/newVer/dealerRanking.jsp?page=0&type=4&job=%E7%9C%9E%20%EC%9B%A8%ED%8E%80%EB%A7%88%EC%8A%A4%ED%84%B0&baseJob=%EA%B7%80%EA%B2%80%EC%82%AC(%EB%82%A8)&weaponType=%EC%A0%84%EC%B2%B4
@@ -384,49 +379,49 @@ public class AdminService {
      */
     @Transactional
     public void getRankByDundam() {
-    	List<JobDetailDto> list = this.jobDetailMapper.selectJobDetailList(new JobDetailDto());
-    	StringBuilder sb = new StringBuilder();
-    	this.rankdataRepository.deleteAll();
-    	RankData rank;
+        List<JobDetailDto> list = this.jobDetailMapper.selectJobDetailList(new JobDetailDto());
+        StringBuilder sb = new StringBuilder();
+        this.rankdataRepository.deleteAll();
+        RankData rank;
 
-    	for (JobDetailDto j : list) {
-    		List<RankData> rankList = Lists.newArrayList();
-    		for (int i = 0; i < 20; i++) {
-    			sb.setLength(0);
-    			sb.append("https://dundam.xyz/newVer/dealerRanking.jsp?page=");
-    			sb.append(i);
-    			sb.append("&type=4&job=");
-    			if ("9".equals(j.getJobValue()) || "10".equals(j.getJobValue())) {
-    				sb.append(EncodeUtil.encodeURIComponent(j.getJob().getJobName()));
-    				sb.append("&baseJob=");
-    				sb.append(EncodeUtil.encodeURIComponent("외전"));
-    			} else {
-    				if (StringUtils.isEmpty(j.getFourthJob())) {
-    					sb.append(EncodeUtil.encodeURIComponent(j.getThirdJob()));
-    				} else {
-    					sb.append(EncodeUtil.encodeURIComponent(j.getFourthJob()));
-    				}
-    				
-    				sb.append("&baseJob=");
-    				sb.append(EncodeUtil.encodeURIComponent(j.getJob().getJobName()));
-    			}
-    			
-    			sb.append("&weaponType=%EC%A0%84%EC%B2%B4");
-    			Document doc = this.openApiService.getJsoupConnect(sb.toString());
-    			Elements els = doc.select(".image");
-    			for (Element e : els) {
-    				rank = new RankData();
-    				rank.setCharacterId(e.select("img").attr("characterid"));
-    				rank.setServerId(e.select("img").attr("server"));
-    				rank.setJobDetailSeq(j.getJobDetailSeq());
-    				System.out.println(rank.getCharacterId() + "_____" + rank.getServerId());
-    				rankList.add(rank);
-    			}
-    		}
-    		
-    		this.rankdataRepository.saveAll(rankList);
-    	}
-    	
+        for (JobDetailDto j : list) {
+            List<RankData> rankList = Lists.newArrayList();
+            for (int i = 0; i < 20; i++) {
+                sb.setLength(0);
+                sb.append("https://dundam.xyz/newVer/dealerRanking.jsp?page=");
+                sb.append(i);
+                sb.append("&type=4&job=");
+                if ("9".equals(j.getJobValue()) || "10".equals(j.getJobValue())) {
+                    sb.append(EncodeUtil.encodeURIComponent(j.getJob().getJobName()));
+                    sb.append("&baseJob=");
+                    sb.append(EncodeUtil.encodeURIComponent("외전"));
+                } else {
+                    if (StringUtils.isEmpty(j.getFourthJob())) {
+                        sb.append(EncodeUtil.encodeURIComponent(j.getThirdJob()));
+                    } else {
+                        sb.append(EncodeUtil.encodeURIComponent(j.getFourthJob()));
+                    }
+                    
+                    sb.append("&baseJob=");
+                    sb.append(EncodeUtil.encodeURIComponent(j.getJob().getJobName()));
+                }
+                
+                sb.append("&weaponType=%EC%A0%84%EC%B2%B4");
+                Document doc = this.openApiService.getJsoupConnect(sb.toString());
+                Elements els = doc.select(".image");
+                for (Element e : els) {
+                    rank = new RankData();
+                    rank.setCharacterId(e.select("img").attr("characterid"));
+                    rank.setServerId(e.select("img").attr("server"));
+                    rank.setJobDetailSeq(j.getJobDetailSeq());
+                    System.out.println(rank.getCharacterId() + "_____" + rank.getServerId());
+                    rankList.add(rank);
+                }
+            }
+            
+            this.rankdataRepository.saveAll(rankList);
+        }
+        
     }
     
     /**
@@ -472,7 +467,7 @@ public class AdminService {
             RankData rank;
 
             if (content.size() < 0) {
-            	throw new BusinessException(resource.getURI().toString() + " 파일을 확인해주세요.");
+                throw new BusinessException(resource.getURI().toString() + " 파일을 확인해주세요.");
             }
             
             for (String s : content) {
@@ -490,76 +485,138 @@ public class AdminService {
         }
     }
     
-    public void test() {
-    	List<RankData> entity = this.rankdataRepository.findAll();
-    	InfoDto look;
-    	Map<String, Integer> optionAbilityMap = null;
-    	Map<String, Integer> emblemsMap = null;
-    	int prevDetailSeq = 0;
-    	
-    	for (RankData r : entity) {
-    		if (prevDetailSeq != r.getJobDetailSeq()) {
-    			emblemsMap = Maps.newHashMap();
-    			optionAbilityMap = Maps.newHashMap();
-    			
-    			prevDetailSeq = r.getJobDetailSeq();
-    			
-    			if (prevDetailSeq != 0) {
-    				
-    			}
-    		}
-    		
-    		JSONObject rs = this.openApiService.getEquipAvatar(r.getServerId(), r.getCharacterId());
-    		List<InfoDto> list = new ArrayList<InfoDto>();
+    /**
+     *  Rank Data로 Emblem,Option 비율 초기화
+     */
+    @Transactional
+    public void initOptionAndEmblemByRankData() {
+        List<RankData> entity = this.rankdataRepository.findAll();
+        if (CollectionUtils.isEmpty(entity)) {
+            throw new BusinessException("Rank Data Empty");
+        }
+
+        List<Emblem> initList = this.emblemRepository.findAll();
+        if (CollectionUtils.isEmpty(initList)) {
+            throw new BusinessException("Emblem Data Empty");
+        }
+
+        // Emblem 비율 초기화
+        for (Emblem e : initList) {
+            e.setRate("");
+        }
+
+        this.optionAbilityRepository.deleteAll();
+
+        int prevDetailSeq = 0;
+        Map<String, Map<String, Integer>> optionAbilityMap = Maps.newHashMap();
+        Map<String, Map<String, Integer>> emblemsMap = Maps.newHashMap();
+
+        for (RankData r : entity) {
+            JSONObject rs = this.openApiService.getEquipAvatar(r.getServerId(), r.getCharacterId());
             JSONArray jsonArr = (JSONArray) rs.get("avatar");
-            int optionAbilityCount = 0;
-            
+
             for (Object o : jsonArr) {
-                look = new InfoDto();
                 JSONObject j = (JSONObject) o;
                 String slotId = (String) j.get("slotId");
 
                 // 오라나 무기압타는 제외
                 if ("AURORA".equals(slotId) || "WEAPON".equals(slotId) || "AURA_SKIN".equals(slotId)) { continue; }
-                look.setSlotName((String) j.get("slotName"));
-                
+                String slotName = j.get("slotName").toString();
                 String optionAbility = j.get("optionAbility").toString(); // 선택옵션
-                
-                // 값이 존재하면 카운트 증가
-                optionAbilityMap.computeIfPresent(optionAbility, (s,count) -> ++count);
-                // 값이 없으면 생성
-                optionAbilityMap.putIfAbsent(optionAbility, 1);
-                optionAbilityCount++;
-                
-                
-                
+
+                // slotName 키값이 없으면 detailMap 생성
+                optionAbilityMap.computeIfAbsent(slotName, key -> new HashMap<String, Integer>());
+                // detailMap count 처리
+                optionAbilityMap.computeIfPresent(slotName, (key, value) -> processEmblemDetail(optionAbility, value));
+
                 JSONArray emblems = (JSONArray) j.get("emblems");
+
                 for (Object o2 : emblems) {
-                	JSONObject j2 = (JSONObject) o2;
-                	String slotColor = j2.get("slotColor").toString();
-                	String itemName = j2.get("itemName").toString();
-                	if ("플래티넘".equals(slotColor)) {
-                		
-                	} else {
-                		
-                	}
-                	
-                	
+                    JSONObject j2 = (JSONObject) o2;
+                    String slotColor = j2.get("slotColor").toString();
+                    String itemName = j2.get("itemName").toString();
+
+                    // slotColor 키값이 없으면 detailMap 생성
+                    emblemsMap.computeIfAbsent(slotColor, key -> new HashMap<String, Integer>());
+                    // detailMap count 처리
+                    emblemsMap.computeIfPresent(slotColor, (key, value) -> processEmblemDetail(itemName, value));
                 }
-                
-                // if slotColor 플래티넘
-                // optionAbility JSONOBject 선택옵션
-                // emblems - JSONArray
-                	// slotColor - 플래티넘
-                	// itemName - 이름
-                // 비율 - 일부값 / 전체값 * 100
-                
-
-
-                list.add(look);
             }
-    	}
+
+            if (prevDetailSeq != r.getJobDetailSeq()) {
+                if (prevDetailSeq != 0) {
+                    EmblemDto emblemDto;
+                    List<EmblemDto> emblemDtoList;
+                    OptionAbilityDto optionAbilityDto;
+                    List<OptionAbilityDto> optionDtoList;
+
+                    // emblemsMap 처리
+                    for (Map.Entry<String, Map<String, Integer>> entry : emblemsMap.entrySet()) {
+                        int detailCount = 0;
+                        emblemDtoList = Lists.newArrayList();
+                        for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
+                            emblemDto = new EmblemDto();
+                            emblemDto.setEmblemName(el.getKey()); // detail Emblem Name
+                            emblemDto.setRate(String.valueOf(el.getValue())); // 개별 카운트
+                            emblemDto.setJobDetailSeq(r.getJobDetailSeq());
+                            emblemDto.setBuffYn("E");
+                            detailCount += el.getValue(); // count
+                            emblemDtoList.add(emblemDto);
+                        }
+
+                        // 비율 = 일부값 / 전체값 * 100
+                        for (EmblemDto e : emblemDtoList) {
+                            e.setRate((Integer.parseInt(e.getRate()) / detailCount * 100) + "%");
+                        }
+
+                        this.emblemRepository.saveAll(ObjectMapperUtils.mapList(emblemDtoList, Emblem.class));
+                    }
+
+                    // optionAbilityMap 처리
+                    for (Map.Entry<String, Map<String, Integer>> entry : optionAbilityMap.entrySet()) {
+                        int detailCount = 0;
+                        optionDtoList = Lists.newArrayList();
+                        for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
+                            optionAbilityDto = new OptionAbilityDto();
+                            optionAbilityDto.setPartsName(el.getKey()); // partsName
+                            optionAbilityDto.setRate(String.valueOf(el.getValue())); // 개별 카운트
+                            optionAbilityDto.setJobDetailSeq(r.getJobDetailSeq());
+                            detailCount += el.getValue();
+                        }
+
+                        // 비율 = 일부값 / 전체값 * 100
+                        for (OptionAbilityDto e : optionDtoList) {
+                            e.setRate((Integer.parseInt(e.getRate()) / detailCount * 100) + "%");
+                        }
+
+                        this.optionAbilityRepository.saveAll(ObjectMapperUtils.mapList(optionDtoList, OptionAbility.class));
+                    }
+                }
+
+                emblemsMap = Maps.newHashMap();
+                optionAbilityMap = Maps.newHashMap();
+                prevDetailSeq = r.getJobDetailSeq();
+            }
+        }
+    }
+
+    /**
+     *  Map 2 Depth Count 처리
+     * @param detailKey
+     * @param detailMap
+     * @return
+     */
+    private Map<String, Integer> processEmblemDetail(String detailKey, Map<String, Integer> detailMap) {
+        if (detailMap.containsKey(detailKey)) {
+            detailMap.computeIfPresent(detailKey, (s,count) -> ++count);
+        } else {
+            detailMap.computeIfAbsent(detailKey, key -> 1);
+        }
+
+        return detailMap;
+    }
+
+    public void test() {
     	
-    	// 마지막에도 처리해줘야함 if != 0
     }
 }
