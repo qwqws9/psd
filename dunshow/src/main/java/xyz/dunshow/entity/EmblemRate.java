@@ -11,14 +11,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "emblem")
+@Table(name = "emblem_rate")
 @Getter
 @Setter
-public class Emblem extends BaseEntity {
+public class EmblemRate extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int emblemSeq;
+	private int emblemRateSeq;
 	@Column
     private int jobDetailSeq;
 	@Column
@@ -26,5 +26,7 @@ public class Emblem extends BaseEntity {
 	@Column
     private String emblemName;
 	@Column
-	private String buffYn;
+	private String rate;
+	@Column
+	private String emblemColor;
 }

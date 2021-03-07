@@ -136,4 +136,25 @@ public class AvatarController {
 
         return "search/detail";
     }
+
+    @RequestMapping("/option/ability")
+    public String ability(Model model) {
+        model.addAttribute("jobList", this.jobService.getJobList());
+        model.addAttribute("partsList", this.jobService.getPartsList());
+        model.addAttribute("jobDetailList", this.jobService.getJobDetailList());
+        return "/option/ability";
+    }
+    
+    @GetMapping("/ability.ajax")
+    @ResponseBody
+    @JsonView(Views.Simple.class)
+    public AjaxResponse test2(String jobSeq) {
+        Map<String, Object> map = Maps.newHashMap();
+
+        map.put("data", this.avatarService.test());
+        
+        
+        
+        return new AjaxResponse(map);
+    }
 }

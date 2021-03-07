@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/base}">
+
+<div layout:fragment="content" class="container-fluid p-0">
+	<div class="row">
+		<div class="col-md-3 col-xl-2">
+
+							<div class="card">
+								<div class="card-header">
+									<h5 class="card-title mb-0">직업 선택</h5>
+								</div>
+
+								<div class="list-group list-group-flush" role="tablist" id="joblist">
+									<th:block th:each="item : ${jobList}">
+<!-- 										<a data-toggle="list" th:attr="href='#target_' + ${item.jobValue}, id=((${item.jobValue} == 0) ? firstTarget), class=((${item.jobValue} == 0) ? 'list-group-item list-group-item-action show active' : 'list-group-item list-group-item-action'), onclick='initData(' + ${item.jobValue} + ')'" role="tab" aria-selected="false" th:text="${item.jobName}"> -->
+										<a data-toggle="list" th:attr="href='#target_' + ${item.jobValue}, id=((${item.jobValue} == 0) ? firstTarget), class=((${item.jobValue} == 0) ? 'list-group-item list-group-item-action show active' : 'list-group-item list-group-item-action')" role="tab" aria-selected="false" th:text="${item.jobName}">
+								        </a>
+									</th:block>
+									
+								</div>
+							</div>
+						</div>
+						
+									
+						<div class="col-md-5 col-xl-7">
+						
+				
+				
+				<!-- 부위별 토글 -->
+						<div class="tab-content">
+							<th:block th:each="item : ${jobList}">
+								<div th:attr="class=((${item.jobValue} == 0) ? 'tab-pane fade active show' : 'tab-pane fade'), id='target_' + ${item.jobValue}" role="tabpanel">
+										<div class="card">
+											<div class="card-header">
+													<ul class="nav nav-pills card-header-pills pull-right" role="tablist">
+														<th:block th:each="jobDetail : ${jobDetailList}">
+															<li class="nav-item" th:if="${item.jobValue == jobDetail.jobValue}">
+																<a data-toggle="tab" th:attr="class='nav-link',href='#jobDetail_' + ${jobDetail.jobDetailSeq}" th:text="${jobDetail.firstJob}"></a>
+															</li>
+														</th:block>
+													</ul>
+											</div>
+											<div class="card-body">
+												<div class="tab-content detailContent">
+													<th:block th:each="jobDetail : ${jobDetailList}" th:if="${item.jobValue == jobDetail.jobValue}">
+														<div th:attr="class='tab-pane fade',id='jobDetail_' + ${jobDetail.jobDetailSeq}" role="tabpanel">
+															<div class="platinum">
+																<ul class="list-unstyled mb-0"></ul>
+															</div>
+															<hr>
+															<div class="row">
+																<div class="col-md-1">
+																	머리
+																</div>
+																<div class="col-md-5 option_hair">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<div class="col-md-6 emblem_green">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<hr class="my-2">
+																<div class="col-md-1">
+																	모자
+																</div>
+																<div class="col-md-5 option_cap">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<div class="col-md-6 emblem_red">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<hr class="my-2">
+																<div class="col-md-1">
+																	얼굴
+																</div>
+																<div class="col-md-5 option_face">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<div class="col-md-6 emblem_yellow">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<hr class="my-2">
+																<div class="col-md-1">
+																	목가슴
+																</div>
+																<div class="col-md-5 option_neck">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<div class="col-md-6 emblem_yellow">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<hr class="my-2">
+																<div class="col-md-1">
+																	상의
+																</div>
+																<div class="col-md-5 option_coat">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<div class="col-md-6 emblem_green">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<hr class="my-2">
+																<div class="col-md-1">
+																	하의
+																</div>
+																<div class="col-md-5 option_pants">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<div class="col-md-6 emblem_green">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<hr class="my-2">
+																<div class="col-md-1">
+																	허리
+																</div>
+																<div class="col-md-5 option_belt">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<div class="col-md-6 emblem_blue">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<hr class="my-2">
+																<div class="col-md-1">
+																	신발
+																</div>
+																<div class="col-md-5 option_shoes">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<div class="col-md-6 emblem_blue">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<hr class="my-2">
+																<div class="col-md-1">
+																	피부
+																</div>
+																<div class="col-md-5 option_skin">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+																<div class="col-md-6 emblem_all">
+																	<ul class="list-unstyled mb-0"></ul>
+																</div>
+															</div>
+														</div>
+													</th:block>
+												</div>
+											</div>
+										</div>
+								</div>
+							</th:block>
+								
+								
+						</div>
+					</div>
+						
+						
+						<!-- 오른쪽 나올것 -->
+		</div>
+</div>
+
+
+<th:block layout:fragment="script">
+<script type="text/javascript">
+	$(document).ready(function () {
+		initData('0');
+	});
+	
+	function initData(jobSeq) {
+		show.data = {};
+		show.data.emblems = {};
+		show.data.options = {};
+		
+	    $.ajax({
+			url : '/avatar/ability.ajax',
+			data : {
+			},
+			success : function(res) {
+				console.log(res);
+				var emblems = res.data.data.emblemRates;
+				var options = res.data.data.optionAbilitys;
+				
+				var i;
+				
+				for (i = 0; i < emblems.length; i++) {
+					if (!show.data.emblems.hasOwnProperty(emblems[i].jobDetailSeq)) {
+						show.data.emblems[emblems[i].jobDetailSeq] = [];
+					}
+					show.data.emblems[emblems[i].jobDetailSeq].push(emblems[i]);
+				}
+				
+				for (i = 0; i < options.length; i++) {
+					if (!show.data.options.hasOwnProperty(options[i].jobDetailSeq)) {
+						show.data.options[options[i].jobDetailSeq] = [];
+					}
+					show.data.options[options[i].jobDetailSeq].push(options[i]);
+				}
+				
+				test();
+			}
+		})
+	}
+	
+	function test() {
+		$.each(show.data.emblems, function(index, item) {
+			test2(show.data.emblems[index]);
+		});
+		$.each(show.data.options, function(index, item) {
+			test3(show.data.options[index]);
+		});
+	}
+	
+	function test2(data) {
+		var prev = '';
+		$.each(data, function(index, item) {
+			var temp = data[index];
+			var seq = temp.jobDetailSeq;
+			var name = temp.emblemName;
+// 			if (prev != temp.emblemColor) {
+// 				name= '<strong>' + temp.emblemName + '</strong>';
+// 				prev = temp.emblemColor;
+// 			}
+			
+			if (temp.emblemColor == 'platinum') {
+				$('#jobDetail_' + seq + ' .platinum ul').append('<li>' + name + ' -> ' + temp.rate + '%</li>');
+			} else {
+				$('#jobDetail_' + seq + ' .emblem_' + temp.emblemColor + ' ul').append('<li>' + name + ' -> ' + temp.rate + '%</li>');
+			}
+			
+		});
+	}
+	
+	function test3(data) {
+		var prev = '';
+		
+		$.each(data, function(index, item) {
+			var temp = data[index];
+			var seq = temp.jobDetailSeq;
+			var name = temp.partsName;
+			
+			$('#jobDetail_' + seq + ' .option_' + temp.choiceOption + ' ul').append('<li>' + name + ' -> ' + temp.rate + '%</li>');
+		});
+		
+		$('.detailContent li:nth-child(1)').attr('style', 'font-weight:bold');
+	}
+</script>
+</th:block>
+
+</html>

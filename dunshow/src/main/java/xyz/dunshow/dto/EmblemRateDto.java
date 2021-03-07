@@ -12,11 +12,12 @@ import xyz.dunshow.view.Views;
 @Setter
 @JsonInclude(value = Include.NON_NULL)
 @JsonView(Views.Simple.class)
-public class EmblemDto extends BaseDto {
+public class EmblemRateDto extends BaseDto {
 
-    private int emblemSeq;
+    private int emblemRateSeq;
     private int jobDetailSeq;
     private String emblemId;
     private String emblemName;
-    private String buffYn;
+    private String rate;
+    private String emblemColor;
 }

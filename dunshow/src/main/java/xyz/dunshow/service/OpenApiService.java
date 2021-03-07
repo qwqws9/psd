@@ -2,6 +2,7 @@ package xyz.dunshow.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.Lists;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import xyz.dunshow.constants.ApiKey;
 import xyz.dunshow.constants.Server;
 import xyz.dunshow.dto.InfoDto;
@@ -30,6 +32,7 @@ import xyz.dunshow.util.EnumCodeUtil;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OpenApiService {
 
 	private final EnumCodeUtil enumCodeUtil;
@@ -267,25 +270,41 @@ public class OpenApiService {
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
         JSONObject obj;
+        HttpURLConnection conn = null;
         
         try {
+            log.info(requestUrl);
             URL url = new URL(requestUrl);
-            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            conn = (HttpURLConnection)url.openConnection();
             conn.setRequestMethod("GET");
-            br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-
             String line;
+
+            br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
             while((line = br.readLine()) != null) {
                 sb.append(line);
             }
 
             obj = (JSONObject)this.parse.parse(sb.toString());
         } catch (Exception e) {
+            String line;
+            if (conn.getErrorStream() != null) {
+                br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                
+                try {
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line);
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+            }
+            System.out.println(e.getMessage());
+            System.out.println(sb.toString());
         	if (e.getMessage().contains("response code: 503")) {
         		throw new BusinessException("서버 점검중");
         	} else {
         		throw new BusinessException("API 응답 에러");
-        		
         	}
         	
         } finally {

@@ -26,11 +26,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import lombok.RequiredArgsConstructor;
+import xyz.dunshow.constants.ClassPath;
 import xyz.dunshow.dto.EmblemDto;
+import xyz.dunshow.dto.EmblemRateDto;
 import xyz.dunshow.dto.JobDetailDto;
 import xyz.dunshow.dto.OptionAbilityDto;
 import xyz.dunshow.dto.ShowRoomDto;
 import xyz.dunshow.entity.Emblem;
+import xyz.dunshow.entity.EmblemRate;
 import xyz.dunshow.entity.Job;
 import xyz.dunshow.entity.JobDetail;
 import xyz.dunshow.entity.OptionAbility;
@@ -38,6 +41,7 @@ import xyz.dunshow.entity.RankData;
 import xyz.dunshow.entity.ShowRoom;
 import xyz.dunshow.exception.BusinessException;
 import xyz.dunshow.mapper.JobDetailMapper;
+import xyz.dunshow.repository.EmblemRateRepository;
 import xyz.dunshow.repository.EmblemRepository;
 import xyz.dunshow.repository.JobDetailRepository;
 import xyz.dunshow.repository.JobRepository;
@@ -68,6 +72,8 @@ public class AdminService {
     private final RankDataRepository rankdataRepository;
     
     private final OptionAbilityRepository optionAbilityRepository;
+    
+    private final EmblemRateRepository emblemRateRepository;
     
     private final List<String> buff = Arrays.asList(
             "오버드라이브",
@@ -130,36 +136,41 @@ public class AdminService {
             );
 
     /**
+     *  classPath 파일 읽어오기
+     * @param classPath
+     * @return
+     */
+    private List<String> initData(String classPath) {
+        ClassPathResource resource = new ClassPathResource(classPath);
+        try {
+            Path path = Paths.get(resource.getURI());
+            return Files.readAllLines(path);
+        } catch (Exception e) {
+            throw new BusinessException(e.getMessage());
+        }
+    }
+
+    /**
      *  showroom data 초기화
      */
     @Transactional
     public void initShowRoomData() {
-        ClassPathResource resource = new ClassPathResource("static/initData/showroomdata.txt");
+        String[] arr;
+        ShowRoomDto room;
+        this.showRoomRepository.deleteAll();
+        List<String> content = this.initData(ClassPath.SHOWROOM);
 
-        try {
-            this.showRoomRepository.deleteAll();
-            Path path = Paths.get(resource.getURI());
-            List<String> content = Files.readAllLines(path);
-            String[] arr;
-            ShowRoomDto room;
+        for (String s : content) {
+            arr = s.split("▦");
+            room = new ShowRoomDto();
+            room.setAvatarName(arr[0]);
+            room.setItemId(arr[1]);
+            room.setPartsName(arr[2]);
+            room.setPreviewIndex(arr[3]);
+            room.setJobValue(arr[4]);
+            room.setRarity(arr[5]);
 
-            
-
-            for (String s : content) {
-                arr = s.split("▦");
-                room = new ShowRoomDto();
-                room.setAvatarName(arr[0]);
-                room.setItemId(arr[1]);
-                room.setPartsName(arr[2]);
-                room.setPreviewIndex(arr[3]);
-                room.setJobValue(arr[4]);
-                room.setRarity(arr[5]);
-
-                this.showRoomRepository.save(room.toEntity(ShowRoom.class));
-            }
-
-        } catch (Exception e) {
-            throw new BusinessException(e.getMessage());
+            this.showRoomRepository.save(room.toEntity(ShowRoom.class));
         }
     }
 
@@ -172,7 +183,7 @@ public class AdminService {
             throw new BusinessException("추출할 데이터가 없습니다.");
         }
 
-        ClassPathResource resource = new ClassPathResource("static/initData/showroomdata.txt");
+        ClassPathResource resource = new ClassPathResource(ClassPath.SHOWROOM);
 
         try {
             Path path = Paths.get(resource.getURI());
@@ -256,31 +267,21 @@ public class AdminService {
      */
     @Transactional
     public void initEmblemData() {
-        ClassPathResource resource = new ClassPathResource("static/initData/emblem.txt");
+        String[] arr;
+        EmblemDto emblem;
+        this.emblemRepository.deleteAll();
 
-        try {
-            this.emblemRepository.deleteAll();
-            Path path = Paths.get(resource.getURI());
-            List<String> content = Files.readAllLines(path);
-            String[] arr;
-            EmblemDto emblem;
+        List<String> content = this.initData(ClassPath.EMBLEM);
 
-            
+        for (String s : content) {
+            arr = s.split("▦");
+            emblem = new EmblemDto();
+            emblem.setBuffYn(arr[0]);
+            emblem.setEmblemId(arr[1]);
+            emblem.setEmblemName(arr[2]);
+            emblem.setJobDetailSeq(Integer.parseInt(arr[3]));
 
-            for (String s : content) {
-                arr = s.split("▦");
-                emblem = new EmblemDto();
-                emblem.setBuffYn(arr[0]);
-                emblem.setEmblemId(arr[1]);
-                emblem.setEmblemName(arr[2]);
-                emblem.setJobDetailSeq(Integer.parseInt(arr[3]));
-                emblem.setRate(arr[4]);
-
-                this.emblemRepository.save(emblem.toEntity(Emblem.class));
-            }
-
-        } catch (Exception e) {
-            throw new BusinessException(e.getMessage());
+            this.emblemRepository.save(emblem.toEntity(Emblem.class));
         }
     }
 
@@ -293,7 +294,7 @@ public class AdminService {
             throw new BusinessException("추출할 데이터가 없습니다.");
         }
 
-        ClassPathResource resource = new ClassPathResource("static/initData/emblem.txt");
+        ClassPathResource resource = new ClassPathResource(ClassPath.EMBLEM);
 
         try {
             Path path = Paths.get(resource.getURI());
@@ -307,8 +308,6 @@ public class AdminService {
                 br.append(s.getEmblemName());
                 br.append("▦");
                 br.append(s.getJobDetailSeq()+"");
-                br.append("▦");
-                br.append(s.getRate());
                 br.newLine();
             }
 
@@ -428,7 +427,7 @@ public class AdminService {
      *  Rank Data 추출
      */
     public void bakRankData() {
-        ClassPathResource resource = new ClassPathResource("static/initData/rank.txt");
+        ClassPathResource resource = new ClassPathResource(ClassPath.RANK);
         List<RankData> list = this.rankdataRepository.findAll();
         try {
             Path path = Paths.get(resource.getURI());
@@ -457,31 +456,19 @@ public class AdminService {
      */
     @Transactional
     public void initRankData() {
-        ClassPathResource resource = new ClassPathResource("static/initData/rank.txt");
+        this.rankdataRepository.deleteAll();
+        List<String> content = this.initData(ClassPath.RANK);
+        String[] arr;
+        RankData rank;
 
-        try {
-            this.rankdataRepository.deleteAll();
-            Path path = Paths.get(resource.getURI());
-            List<String> content = Files.readAllLines(path);
-            String[] arr;
-            RankData rank;
+        for (String s : content) {
+            arr = s.split("▦");
+            rank = new RankData();
+            rank.setCharacterId((arr[0]));
+            rank.setServerId(arr[1]);
+            rank.setJobDetailSeq(Integer.parseInt(arr[2]));
 
-            if (content.size() < 0) {
-                throw new BusinessException(resource.getURI().toString() + " 파일을 확인해주세요.");
-            }
-            
-            for (String s : content) {
-                arr = s.split("▦");
-                rank = new RankData();
-                rank.setCharacterId((arr[0]));
-                rank.setServerId(arr[1]);
-                rank.setJobDetailSeq(Integer.parseInt(arr[2]));
-
-                this.rankdataRepository.save(rank);
-            }
-
-        } catch (Exception e) {
-            throw new BusinessException(e.getMessage());
+            this.rankdataRepository.save(rank);
         }
     }
     
@@ -495,23 +482,68 @@ public class AdminService {
             throw new BusinessException("Rank Data Empty");
         }
 
-        List<Emblem> initList = this.emblemRepository.findAll();
-        if (CollectionUtils.isEmpty(initList)) {
-            throw new BusinessException("Emblem Data Empty");
-        }
-
-        // Emblem 비율 초기화
-        for (Emblem e : initList) {
-            e.setRate("");
-        }
-
+        this.emblemRateRepository.deleteAll();
         this.optionAbilityRepository.deleteAll();
 
         int prevDetailSeq = 0;
+        EmblemRateDto emblemRateDto;
+        List<EmblemRateDto> emblemDtoList;
+        OptionAbilityDto optionAbilityDto;
+        List<OptionAbilityDto> optionDtoList;
         Map<String, Map<String, Integer>> optionAbilityMap = Maps.newHashMap();
         Map<String, Map<String, Integer>> emblemsMap = Maps.newHashMap();
 
         for (RankData r : entity) {
+            if (prevDetailSeq != r.getJobDetailSeq()) {
+                // emblemsMap 처리
+                for (Map.Entry<String, Map<String, Integer>> entry : emblemsMap.entrySet()) {
+                    int detailCount = 0;
+                    emblemDtoList = Lists.newArrayList();
+                    for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
+                        emblemRateDto = new EmblemRateDto();
+                        emblemRateDto.setEmblemName(el.getKey()); // detail Emblem Name
+                        emblemRateDto.setEmblemColor(entry.getKey());
+                        emblemRateDto.setRate(String.valueOf(el.getValue())); // 개별 카운트
+                        emblemRateDto.setJobDetailSeq(prevDetailSeq);
+                        detailCount += el.getValue(); // count
+                        emblemDtoList.add(emblemRateDto);
+                    }
+
+                    // 비율 = 일부값 / 전체값 * 100
+                    for (EmblemRateDto e : emblemDtoList) {
+                        e.setRate(String.format("%.2f", (Double.parseDouble(e.getRate()) / detailCount * 100)));
+                    }
+
+                    this.emblemRateRepository.saveAll(ObjectMapperUtils.mapList(emblemDtoList, EmblemRate.class));
+                }
+
+                // optionAbilityMap 처리
+                for (Map.Entry<String, Map<String, Integer>> entry : optionAbilityMap.entrySet()) {
+                    int detailCount = 0;
+                    optionDtoList = Lists.newArrayList();
+                    for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
+                        optionAbilityDto = new OptionAbilityDto();
+                        optionAbilityDto.setChoiceOption(entry.getKey());
+                        optionAbilityDto.setPartsName(el.getKey()); // partsName
+                        optionAbilityDto.setRate(String.valueOf(el.getValue())); // 개별 카운트
+                        optionAbilityDto.setJobDetailSeq(prevDetailSeq);
+                        detailCount += el.getValue();
+                        optionDtoList.add(optionAbilityDto);
+                    }
+
+                    // 비율 = 일부값 / 전체값 * 100
+                    for (OptionAbilityDto e : optionDtoList) {
+                        e.setRate(String.format("%.2f", (Double.parseDouble(e.getRate()) / detailCount * 100)));
+                    }
+
+                    this.optionAbilityRepository.saveAll(ObjectMapperUtils.mapList(optionDtoList, OptionAbility.class));
+                }
+
+                emblemsMap = Maps.newHashMap();
+                optionAbilityMap = Maps.newHashMap();
+                prevDetailSeq = r.getJobDetailSeq();
+            }
+
             JSONObject rs = this.openApiService.getEquipAvatar(r.getServerId(), r.getCharacterId());
             JSONArray jsonArr = (JSONArray) rs.get("avatar");
 
@@ -542,61 +574,50 @@ public class AdminService {
                     emblemsMap.computeIfPresent(slotColor, (key, value) -> processEmblemDetail(itemName, value));
                 }
             }
+        }
 
-            if (prevDetailSeq != r.getJobDetailSeq()) {
-                if (prevDetailSeq != 0) {
-                    EmblemDto emblemDto;
-                    List<EmblemDto> emblemDtoList;
-                    OptionAbilityDto optionAbilityDto;
-                    List<OptionAbilityDto> optionDtoList;
-
-                    // emblemsMap 처리
-                    for (Map.Entry<String, Map<String, Integer>> entry : emblemsMap.entrySet()) {
-                        int detailCount = 0;
-                        emblemDtoList = Lists.newArrayList();
-                        for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
-                            emblemDto = new EmblemDto();
-                            emblemDto.setEmblemName(el.getKey()); // detail Emblem Name
-                            emblemDto.setRate(String.valueOf(el.getValue())); // 개별 카운트
-                            emblemDto.setJobDetailSeq(r.getJobDetailSeq());
-                            emblemDto.setBuffYn("E");
-                            detailCount += el.getValue(); // count
-                            emblemDtoList.add(emblemDto);
-                        }
-
-                        // 비율 = 일부값 / 전체값 * 100
-                        for (EmblemDto e : emblemDtoList) {
-                            e.setRate((Integer.parseInt(e.getRate()) / detailCount * 100) + "%");
-                        }
-
-                        this.emblemRepository.saveAll(ObjectMapperUtils.mapList(emblemDtoList, Emblem.class));
-                    }
-
-                    // optionAbilityMap 처리
-                    for (Map.Entry<String, Map<String, Integer>> entry : optionAbilityMap.entrySet()) {
-                        int detailCount = 0;
-                        optionDtoList = Lists.newArrayList();
-                        for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
-                            optionAbilityDto = new OptionAbilityDto();
-                            optionAbilityDto.setPartsName(el.getKey()); // partsName
-                            optionAbilityDto.setRate(String.valueOf(el.getValue())); // 개별 카운트
-                            optionAbilityDto.setJobDetailSeq(r.getJobDetailSeq());
-                            detailCount += el.getValue();
-                        }
-
-                        // 비율 = 일부값 / 전체값 * 100
-                        for (OptionAbilityDto e : optionDtoList) {
-                            e.setRate((Integer.parseInt(e.getRate()) / detailCount * 100) + "%");
-                        }
-
-                        this.optionAbilityRepository.saveAll(ObjectMapperUtils.mapList(optionDtoList, OptionAbility.class));
-                    }
-                }
-
-                emblemsMap = Maps.newHashMap();
-                optionAbilityMap = Maps.newHashMap();
-                prevDetailSeq = r.getJobDetailSeq();
+        // emblemsMap 처리
+        for (Map.Entry<String, Map<String, Integer>> entry : emblemsMap.entrySet()) {
+            int detailCount = 0;
+            emblemDtoList = Lists.newArrayList();
+            for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
+                emblemRateDto = new EmblemRateDto();
+                emblemRateDto.setEmblemName(el.getKey()); // detail Emblem Name
+                emblemRateDto.setEmblemColor(entry.getKey());
+                emblemRateDto.setRate(String.valueOf(el.getValue())); // 개별 카운트
+                emblemRateDto.setJobDetailSeq(prevDetailSeq);
+                detailCount += el.getValue(); // count
+                emblemDtoList.add(emblemRateDto);
             }
+
+            // 비율 = 일부값 / 전체값 * 100
+            for (EmblemRateDto e : emblemDtoList) {
+                e.setRate(String.format("%.2f", (Double.parseDouble(e.getRate()) / detailCount * 100)));
+            }
+
+            this.emblemRateRepository.saveAll(ObjectMapperUtils.mapList(emblemDtoList, EmblemRate.class));
+        }
+
+        // optionAbilityMap 처리
+        for (Map.Entry<String, Map<String, Integer>> entry : optionAbilityMap.entrySet()) {
+            int detailCount = 0;
+            optionDtoList = Lists.newArrayList();
+            for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
+                optionAbilityDto = new OptionAbilityDto();
+                optionAbilityDto.setChoiceOption(entry.getKey());
+                optionAbilityDto.setPartsName(el.getKey()); // partsName
+                optionAbilityDto.setRate(String.valueOf(el.getValue())); // 개별 카운트
+                optionAbilityDto.setJobDetailSeq(prevDetailSeq);
+                detailCount += el.getValue();
+                optionDtoList.add(optionAbilityDto);
+            }
+
+            // 비율 = 일부값 / 전체값 * 100
+            for (OptionAbilityDto e : optionDtoList) {
+                e.setRate(String.format("%.2f", (Double.parseDouble(e.getRate()) / detailCount * 100)));
+            }
+
+            this.optionAbilityRepository.saveAll(ObjectMapperUtils.mapList(optionDtoList, OptionAbility.class));
         }
     }
 

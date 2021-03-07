@@ -6,10 +6,11 @@
             <i class="hamburger align-self-center"></i>
         </a>
 
-        <form class="d-none d-sm-inline-block">
+        <form class="d-none d-sm-inline-block" action="/avatar/search/list">
             <div class="input-group input-group-navbar">
-                <input type="text" class="form-control" placeholder="Search…" aria-label="Search">
-                <button class="btn" type="button">
+            	<input type="hidden" name="server" value="all"/>
+                <input type="text" class="form-control" placeholder="Search…" aria-label="Search" name="name">
+                <button class="btn" type="submit">
                     <i class="align-middle" data-feather="search"></i>
                 </button>
             </div>
