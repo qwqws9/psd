@@ -211,12 +211,14 @@ public class OpenApiService {
      * @param limit
      * @return
      */
-    public JSONObject getMarket(String title, String emblemCode, String rarity, String jobId, String limit) {
+    public JSONObject getMarket(String title, String emblemCode, String rarity, String jobId, String wordType, String limit) {
         
         StringBuilder sb = new StringBuilder();
         sb.append(ApiKey.NEOPLE_API_URL);
         sb.append("avatar-market/sale?title=");
         sb.append(title);
+        sb.append("&wordType=");
+        sb.append(wordType);
         sb.append("&q=jobId:");
         sb.append(jobId);
         sb.append(",emblemCode:");

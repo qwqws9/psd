@@ -168,9 +168,34 @@ public class DataService {
     	}
     }
     
-    private void getMarket(String title, String jobId) {
-    	JSONObject rs = this.api.getMarket(title, "000", EncodeUtil.encodeURIComponent("레어"), jobId, "50");
-    	
+    // 100, 110, 120, 130, 999
+    private void getMarket(String searchTitle, String jobId) {
+    	JSONObject rs = this.api.getMarket(searchTitle, "100", EncodeUtil.encodeURIComponent("레어"), jobId, "front", "50");
+    	JSONArray arr = (JSONArray) rs.get("rows");
+    	for (Object o : arr) {
+    	    JSONObject obj = (JSONObject) o;
+    	    String title = obj.get("title").toString(); // 이름
+    	    String price = obj.get("price").toString();
+    	    // emblem for돌때 가져오기
+    	    JSONArray arr2 = (JSONArray) obj.get("avatar");
+    	    for (Object o2 : arr2) {
+    	        JSONObject obj2 = (JSONObject) o2;
+    	        String slotId = obj2.get("slotId").toString().toLowerCase(); // hair
+    	        String itemName = obj2.get("itemName").toString();
+    	        if ("jacket".equals(slotId)) {
+    	            String jacketOption = itemName; // 이걸로 먼저 JOB_VALUE 조회 후 정해서 하위옵들 조회
+    	        }
+    	        String optionAbility = obj2.get("optionAbility").toString();
+    	        JSONArray arr3 = (JSONArray) obj2.get("emblems");
+    	        for (Object o3 : arr3) {
+    	            JSONObject obj3 = (JSONObject) o3;
+    	            String slotColor = obj3.get("slotColor").toString();
+    	            String emblemName = obj3.get("itemName").toString();
+    	        }
+    	    }
+    	    
+    	    
+    	}
     	String aa = "";
     }
     
