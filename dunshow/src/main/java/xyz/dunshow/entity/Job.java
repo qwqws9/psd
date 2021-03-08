@@ -25,4 +25,6 @@ public class Job extends BaseEntity {
 	private String jobName;
 	@Column
 	private String jobId;
+	@Column
+	private String jobDesc;
 }

@@ -16,7 +16,10 @@ import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import xyz.dunshow.constants.Server;
 import xyz.dunshow.dto.InfoDto;
+import xyz.dunshow.entity.Job;
 import xyz.dunshow.exception.BusinessException;
+import xyz.dunshow.repository.JobRepository;
+import xyz.dunshow.util.EncodeUtil;
 import xyz.dunshow.util.EnumCodeUtil;
 
 @Service
@@ -26,6 +29,8 @@ public class DataService {
     private final OpenApiService api;
 
     private final EnumCodeUtil enumCodeUtil;
+    
+    private final JobRepository jobRepository;
 
     public Map<String, Object> getSearchDetail(String server, String characterId) {
         // 유효성 체크
@@ -143,11 +148,35 @@ public class DataService {
         return map;
     }
     
+    public void test() {
+    	List<Job> jobList = this.jobRepository.findAll();
+    	StringBuilder sb = new StringBuilder();
+    	
+    	for (Job j : jobList) {
+    		if(StringUtils.isEmpty(j.getJobDesc())) { continue; }
+    		
+
+    		// method call
+    		for (int i = 1; i < 16; i++) {
+    			sb.setLength(0);
+        		sb.append(j.getJobDesc());
+        		sb.append(" ");
+    			sb.append(i);
+    			sb.append("차 레어");
+    			this.getMarket(EncodeUtil.encodeURIComponent(sb.toString()), j.getJobId());
+    		}
+    	}
+    }
     
+    private void getMarket(String title, String jobId) {
+    	JSONObject rs = this.api.getMarket(title, "000", EncodeUtil.encodeURIComponent("레어"), jobId, "50");
+    	
+    	String aa = "";
+    }
     
-    
-    
-    
+    private void dataProcess() {
+    	
+    }
     
     
     

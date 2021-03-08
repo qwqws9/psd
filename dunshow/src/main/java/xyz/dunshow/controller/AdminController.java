@@ -22,6 +22,7 @@ import xyz.dunshow.dto.UserSession;
 import xyz.dunshow.exception.BusinessException;
 import xyz.dunshow.exception.PageException;
 import xyz.dunshow.service.AdminService;
+import xyz.dunshow.service.DataService;
 import xyz.dunshow.service.JobService;
 import xyz.dunshow.service.OpenApiService;
 import xyz.dunshow.view.Views;
@@ -36,6 +37,8 @@ public class AdminController {
     private final AdminService adminService;
 
     private final OpenApiService openApiService;
+
+    private final DataService dataService;
 
     @GetMapping("/dataManage")
     public String main(Model model, @LoginUser UserSession userSession) {
@@ -100,6 +103,9 @@ public class AdminController {
 
         } else if ("initOptionAndEmblemByRankData".equals(target)) {
             this.adminService.initOptionAndEmblemByRankData();
+
+        } else if ("testDataCase".equals(target)) {
+        	this.dataService.test();
         }
 
         return new AjaxResponse("200", "성공");

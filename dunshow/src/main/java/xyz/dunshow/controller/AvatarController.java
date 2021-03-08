@@ -133,6 +133,7 @@ public class AvatarController {
         model.addAttribute("data", map.get("data"));
         model.addAttribute("totalPrice", map.get("totalPrice"));
         model.addAttribute("totalAverage", map.get("totalAverage"));
+        model.addAttribute("imgSrc", "https://img-api.neople.co.kr/df/servers/" + serverId +"/characters/"+ characterId + "?zoom=1");
 
         return "search/detail";
     }

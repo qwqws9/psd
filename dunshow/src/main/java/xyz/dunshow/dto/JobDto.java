@@ -18,4 +18,5 @@ public class JobDto extends BaseDto {
     private String jobValue;
     private String jobName;
     private String jobId;
+    private String jobDesc;
 }

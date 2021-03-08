@@ -557,9 +557,12 @@ public class AdminService {
                 String optionAbility = j.get("optionAbility").toString(); // 선택옵션
 
                 // slotName 키값이 없으면 detailMap 생성
-                optionAbilityMap.computeIfAbsent(slotName, key -> new HashMap<String, Integer>());
+//                optionAbilityMap.computeIfAbsent(slotName, key -> new HashMap<String, Integer>());
                 // detailMap count 처리
-                optionAbilityMap.computeIfPresent(slotName, (key, value) -> processEmblemDetail(optionAbility, value));
+//                optionAbilityMap.computeIfPresent(slotName, (key, value) -> processEmblemDetail(optionAbility, value));
+
+                // 리팩토링 -> 주의.. default값이 0이므로 값 세팅시 +1 해줘야함
+                emblemsMap.merge(slotName, new HashMap<String, Integer>(),(value, defaultMap) -> processEmblemDetail(optionAbility, value));
 
                 JSONArray emblems = (JSONArray) j.get("emblems");
 
@@ -569,9 +572,12 @@ public class AdminService {
                     String itemName = j2.get("itemName").toString();
 
                     // slotColor 키값이 없으면 detailMap 생성
-                    emblemsMap.computeIfAbsent(slotColor, key -> new HashMap<String, Integer>());
+//                    emblemsMap.computeIfAbsent(slotColor, key -> new HashMap<String, Integer>());
                     // detailMap count 처리
-                    emblemsMap.computeIfPresent(slotColor, (key, value) -> processEmblemDetail(itemName, value));
+//                    emblemsMap.computeIfPresent(slotColor, (key, value) -> processEmblemDetail(itemName, value));
+                    
+                    // 리팩토링 -> 주의.. default값이 0이므로 값 세팅시 +1 해줘야함
+                    emblemsMap.merge(slotColor, new HashMap<String, Integer>(),(value, defaultMap) -> processEmblemDetail(itemName, value));
                 }
             }
         }
@@ -584,7 +590,7 @@ public class AdminService {
                 emblemRateDto = new EmblemRateDto();
                 emblemRateDto.setEmblemName(el.getKey()); // detail Emblem Name
                 emblemRateDto.setEmblemColor(entry.getKey());
-                emblemRateDto.setRate(String.valueOf(el.getValue())); // 개별 카운트
+                emblemRateDto.setRate(String.valueOf(el.getValue() + 1)); // 개별 카운트
                 emblemRateDto.setJobDetailSeq(prevDetailSeq);
                 detailCount += el.getValue(); // count
                 emblemDtoList.add(emblemRateDto);
@@ -604,9 +610,9 @@ public class AdminService {
             optionDtoList = Lists.newArrayList();
             for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
                 optionAbilityDto = new OptionAbilityDto();
-                optionAbilityDto.setChoiceOption(entry.getKey());
-                optionAbilityDto.setPartsName(el.getKey()); // partsName
-                optionAbilityDto.setRate(String.valueOf(el.getValue())); // 개별 카운트
+                optionAbilityDto.setChoiceOption(el.getKey());
+                optionAbilityDto.setPartsName(entry.getKey()); // partsName
+                optionAbilityDto.setRate(String.valueOf(el.getValue() + 1)); // 개별 카운트
                 optionAbilityDto.setJobDetailSeq(prevDetailSeq);
                 detailCount += el.getValue();
                 optionDtoList.add(optionAbilityDto);
@@ -628,11 +634,14 @@ public class AdminService {
      * @return
      */
     private Map<String, Integer> processEmblemDetail(String detailKey, Map<String, Integer> detailMap) {
-        if (detailMap.containsKey(detailKey)) {
-            detailMap.computeIfPresent(detailKey, (s,count) -> ++count);
-        } else {
-            detailMap.computeIfAbsent(detailKey, key -> 1);
-        }
+//        if (detailMap.containsKey(detailKey)) {
+//            detailMap.computeIfPresent(detailKey, (s,count) -> ++count);
+//        } else {
+//            detailMap.computeIfAbsent(detailKey, key -> 1);
+//        }
+        
+    	// 리팩토링
+        detailMap.merge(detailKey, 1, (value, defaultValue) -> ++value);
 
         return detailMap;
     }

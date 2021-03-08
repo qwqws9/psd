@@ -221,7 +221,7 @@ public class OpenApiService {
         sb.append(jobId);
         sb.append(",emblemCode:");
         sb.append(emblemCode);
-        sb.append(",avatarRarity");
+        sb.append(",avatarRarity:");
         sb.append(rarity);
         sb.append("&sort=price:asc");
         sb.append("&limit=");
