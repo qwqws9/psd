@@ -16,6 +16,8 @@ import xyz.dunshow.dto.OptionAbilityDto;
 import xyz.dunshow.entity.EmblemRate;
 import xyz.dunshow.entity.OptionAbility;
 import xyz.dunshow.entity.ShowRoom;
+import xyz.dunshow.mapper.EmblemRateMapper;
+import xyz.dunshow.mapper.OptionAbilityMapper;
 import xyz.dunshow.repository.EmblemRateRepository;
 import xyz.dunshow.repository.OptionAbilityRepository;
 import xyz.dunshow.repository.ShowRoomRepository;
@@ -30,6 +32,10 @@ public class AvatarService {
     private final EmblemRateRepository emblemRateRepository;
 
     private final ShowRoomRepository showRoomRepository;
+    
+    private final EmblemRateMapper emblemRateMapper;
+    
+    private final OptionAbilityMapper optionAbilityMapper;
     
     public List<ShowRoom> getAvatarListByJobSeq(String jobValue) {
         List<ShowRoom> list = this.showRoomRepository.findByJobValue(jobValue);
@@ -47,14 +53,16 @@ public class AvatarService {
         return list;
     }
 
-    public InfoDto test() {
-        List<EmblemRate> emblems = this.emblemRateRepository.findAll(Sort.by(Order.asc("jobDetailSeq"), Order.desc("rate")));
-        List<OptionAbility> options = this.optionAbilityRepository.findAll(Sort.by(Order.asc("jobDetailSeq"), Order.desc("rate")));
-        
-        InfoDto info = new InfoDto();
-        info.setEmblemRates(ObjectMapperUtils.mapList(emblems, EmblemRateDto.class));
-        info.setOptionAbilitys(ObjectMapperUtils.mapList(options, OptionAbilityDto.class));
-        
+    public InfoDto getCorrectOption() {
+//        List<EmblemRate> emblems = this.emblemRateRepository.findAll(Sort.by(Order.asc("jobDetailSeq"), Order.desc("rate")));
+//        List<OptionAbility> options = this.optionAbilityRepository.findAll(Sort.by(Order.asc("jobDetailSeq"), Order.desc("rate")));
+//        info.setEmblemRates(ObjectMapperUtils.mapList(emblems, EmblemRateDto.class));
+//        info.setOptionAbilitys(ObjectMapperUtils.mapList(options, OptionAbilityDto.class));
+    	InfoDto info = new InfoDto();
+    	
+    	info.setEmblemRates(this.emblemRateMapper.selectAll());
+    	info.setOptionAbilitys(this.optionAbilityMapper.selectAll());
+    	
         return info;
     }
 }

@@ -6,4 +6,5 @@ import xyz.dunshow.entity.OptionAbility;
 
 public interface OptionAbilityRepository extends JpaRepository<OptionAbility, Integer>{
 
+	OptionAbility findByChoiceOption(String choiceOption);
 }

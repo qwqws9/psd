@@ -35,6 +35,8 @@ import xyz.dunshow.util.EnumCodeUtil;
 @Slf4j
 public class OpenApiService {
 
+	// https://developers.neople.co.kr/contents/apiDocs/df
+	
 	private final EnumCodeUtil enumCodeUtil;
 
 	private final JSONParser parse = new JSONParser();
@@ -211,7 +213,7 @@ public class OpenApiService {
      * @param limit
      * @return
      */
-    public JSONObject getMarket(String title, String emblemCode, String rarity, String jobId, String wordType, String limit) {
+    public JSONObject getMarket(String title, String emblemCode, String rarity, String jobId, String wordType, String minCount, String maxCount, String limit) {
         
         StringBuilder sb = new StringBuilder();
         sb.append(ApiKey.NEOPLE_API_URL);
@@ -225,6 +227,10 @@ public class OpenApiService {
         sb.append(emblemCode);
         sb.append(",avatarRarity:");
         sb.append(rarity);
+        sb.append(",minAvatarCount:");
+        sb.append(minCount);
+        sb.append(",maxAvatarCount:");
+        sb.append(maxCount);
         sb.append("&sort=price:asc");
         sb.append("&limit=");
         sb.append(limit);

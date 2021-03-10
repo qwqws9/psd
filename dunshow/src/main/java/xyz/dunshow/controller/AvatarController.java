@@ -152,7 +152,7 @@ public class AvatarController {
     public AjaxResponse test2(String jobSeq) {
         Map<String, Object> map = Maps.newHashMap();
 
-        map.put("data", this.avatarService.test());
+        map.put("data", this.avatarService.getCorrectOption());
         
         
         

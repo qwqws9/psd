@@ -70,42 +70,38 @@ public class AdminController {
 
         if ("initShowRoomData".equals(target)) {
             this.adminService.initShowRoomData();
-
         } else if ("bakShowRoomData".equals(target)) {
             this.adminService.bakShowRoomData();
-
         } else if ("getEmblem".equals(target)) {
             this.adminService.getEmblem();
-
         } else if ("initEmblemData".equals(target)) {
             this.adminService.initEmblemData();
-
         } else if ("bakEmblemData".equals(target)) {
             this.adminService.bakEmblemData();
-
         } else if ("initJobDetail".equals(target)) {
             this.adminService.getJobDetail();
-
         } else if ("ioIdInsert".equals(target)) {
             this.openApiService.ioIdInsert();
-
         } else if ("getRankByDundam".equals(target)) {
             this.adminService.getRankByDundam();
-
         } else if ("initRankData".equals(target)) {
             this.adminService.initRankData();
-
         } else if ("testCase".equals(target)) {  // 테스트 메서드
             this.adminService.test();
-
         } else if ("bakRankData".equals(target)) {
             this.adminService.bakRankData();
-
         } else if ("initOptionAndEmblemByRankData".equals(target)) {
             this.adminService.initOptionAndEmblemByRankData();
-
         } else if ("testDataCase".equals(target)) {
         	this.dataService.test();
+        } else if ("initEmblemRateData".equals(target)) {
+        	this.adminService.initEmblemRateData();
+        } else if ("bakEmblemRateData".equals(target)) {
+        	this.adminService.bakEmblemRateData();
+        } else if ("initOptionAbilityData".equals(target)) {
+        	this.adminService.initOptionAbilityData();
+        } else if ("bakOptionAbilityData".equals(target)) {
+        	this.adminService.bakOptionAbilityData();
         }
 
         return new AjaxResponse("200", "성공");

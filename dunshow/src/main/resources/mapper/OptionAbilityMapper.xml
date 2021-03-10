@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="xyz.dunshow.mapper.OptionAbilityMapper">
+
+	<select id="selectAll" resultType="OptionAbilityDto">
+		SELECT *
+		  FROM OPTION_ABILITY
+	     ORDER BY JOB_DETAIL_SEQ, CAST(RATE AS DECIMAL(4,2)) DESC
+	</select>
+</mapper>

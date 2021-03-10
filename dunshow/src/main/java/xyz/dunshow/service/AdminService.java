@@ -27,6 +27,8 @@ import com.google.common.collect.Maps;
 
 import lombok.RequiredArgsConstructor;
 import xyz.dunshow.constants.ClassPath;
+import xyz.dunshow.constants.Color;
+import xyz.dunshow.constants.PartsName;
 import xyz.dunshow.dto.EmblemDto;
 import xyz.dunshow.dto.EmblemRateDto;
 import xyz.dunshow.dto.JobDetailDto;
@@ -49,6 +51,7 @@ import xyz.dunshow.repository.OptionAbilityRepository;
 import xyz.dunshow.repository.RankDataRepository;
 import xyz.dunshow.repository.ShowRoomRepository;
 import xyz.dunshow.util.EncodeUtil;
+import xyz.dunshow.util.EnumCodeUtil;
 import xyz.dunshow.util.ObjectMapperUtils;
 
 @Service
@@ -74,6 +77,8 @@ public class AdminService {
     private final OptionAbilityRepository optionAbilityRepository;
     
     private final EmblemRateRepository emblemRateRepository;
+    
+    private final EnumCodeUtil enumCodeUtil;
     
     private final List<String> buff = Arrays.asList(
             "오버드라이브",
@@ -201,6 +206,119 @@ public class AdminService {
                 br.append(s.getJobValue());
                 br.append("▦");
                 br.append(s.getRarity());
+                br.newLine();
+            }
+
+            br.flush();
+            br.close();
+        } catch (Exception e) {
+            throw new BusinessException(e.getMessage());
+        }
+    }
+
+    /**
+     *  emblem_rate data 초기화
+     */
+    @Transactional
+    public void initEmblemRateData() {
+        String[] arr;
+        EmblemRateDto room;
+        this.emblemRateRepository.deleteAll();
+        List<String> content = this.initData(ClassPath.EMBLEM_RATE);
+
+        for (String s : content) {
+            arr = s.split("▦");
+            room = new EmblemRateDto();
+            room.setEmblemId(arr[0]);
+            room.setJobDetailSeq(Integer.parseInt(arr[1]));
+            room.setEmblemName(arr[2]);
+            room.setRate(arr[3]);
+            room.setEmblemColor(arr[4]);
+
+            this.emblemRateRepository.save(room.toEntity(EmblemRate.class));
+        }
+    }
+
+    /**
+     *  emblem_rate 테이블에 있는 data 백업
+     */
+    public void bakEmblemRateData() {
+        List<EmblemRate> entity = this.emblemRateRepository.findAll();
+        if (entity == null) {
+            throw new BusinessException("추출할 데이터가 없습니다.");
+        }
+
+        ClassPathResource resource = new ClassPathResource(ClassPath.EMBLEM_RATE);
+
+        try {
+            Path path = Paths.get(resource.getURI());
+            BufferedWriter br = new BufferedWriter(new FileWriter(path.toString(), false));
+
+            for (EmblemRate s : entity) {
+                br.append(s.getEmblemId());
+                br.append("▦");
+                br.append(s.getJobDetailSeq() + "");
+                br.append("▦");
+                br.append(s.getEmblemName());
+                br.append("▦");
+                br.append(s.getRate());
+                br.append("▦");
+                br.append(s.getEmblemColor());
+                br.newLine();
+            }
+
+            br.flush();
+            br.close();
+        } catch (Exception e) {
+            throw new BusinessException(e.getMessage());
+        }
+    }
+    
+    /**
+     *  optionAbility data 초기화
+     */
+    @Transactional
+    public void initOptionAbilityData() {
+        String[] arr;
+        OptionAbilityDto room;
+        this.optionAbilityRepository.deleteAll();
+        List<String> content = this.initData(ClassPath.OPTION_ABILITY);
+
+        for (String s : content) {
+            arr = s.split("▦");
+            room = new OptionAbilityDto();
+            room.setChoiceOption(arr[0]);
+            room.setJobDetailSeq(Integer.parseInt(arr[1]));
+            room.setPartsName(arr[2]);
+            room.setRate(arr[3]);
+
+            this.optionAbilityRepository.save(room.toEntity(OptionAbility.class));
+        }
+    }
+
+    /**
+     *  optionAbility 테이블에 있는 data 백업
+     */
+    public void bakOptionAbilityData() {
+        List<OptionAbility> entity = this.optionAbilityRepository.findAll();
+        if (entity == null) {
+            throw new BusinessException("추출할 데이터가 없습니다.");
+        }
+
+        ClassPathResource resource = new ClassPathResource(ClassPath.OPTION_ABILITY);
+
+        try {
+            Path path = Paths.get(resource.getURI());
+            BufferedWriter br = new BufferedWriter(new FileWriter(path.toString(), false));
+
+            for (OptionAbility s : entity) {
+                br.append(s.getChoiceOption());
+                br.append("▦");
+                br.append(s.getJobDetailSeq() + "");
+                br.append("▦");
+                br.append(s.getPartsName());
+                br.append("▦");
+                br.append(s.getRate());
                 br.newLine();
             }
 
@@ -477,6 +595,9 @@ public class AdminService {
      */
     @Transactional
     public void initOptionAndEmblemByRankData() {
+    	Map<String, String> colorMap = this.enumCodeUtil.getMap(Color.CODE);
+    	Map<String, String> partsMap = this.enumCodeUtil.getMap(PartsName.CODE);
+    	
         List<RankData> entity = this.rankdataRepository.findAll();
         if (CollectionUtils.isEmpty(entity)) {
             throw new BusinessException("Rank Data Empty");
@@ -502,7 +623,7 @@ public class AdminService {
                     for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
                         emblemRateDto = new EmblemRateDto();
                         emblemRateDto.setEmblemName(el.getKey()); // detail Emblem Name
-                        emblemRateDto.setEmblemColor(entry.getKey());
+                        emblemRateDto.setEmblemColor(colorMap.get(entry.getKey()));
                         emblemRateDto.setRate(String.valueOf(el.getValue())); // 개별 카운트
                         emblemRateDto.setJobDetailSeq(prevDetailSeq);
                         detailCount += el.getValue(); // count
@@ -523,8 +644,8 @@ public class AdminService {
                     optionDtoList = Lists.newArrayList();
                     for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
                         optionAbilityDto = new OptionAbilityDto();
-                        optionAbilityDto.setChoiceOption(entry.getKey());
-                        optionAbilityDto.setPartsName(el.getKey()); // partsName
+                        optionAbilityDto.setChoiceOption(el.getKey());
+                        optionAbilityDto.setPartsName(partsMap.get(entry.getKey())); // partsName
                         optionAbilityDto.setRate(String.valueOf(el.getValue())); // 개별 카운트
                         optionAbilityDto.setJobDetailSeq(prevDetailSeq);
                         detailCount += el.getValue();
@@ -562,7 +683,7 @@ public class AdminService {
 //                optionAbilityMap.computeIfPresent(slotName, (key, value) -> processEmblemDetail(optionAbility, value));
 
                 // 리팩토링 -> 주의.. default값이 0이므로 값 세팅시 +1 해줘야함
-                emblemsMap.merge(slotName, new HashMap<String, Integer>(),(value, defaultMap) -> processEmblemDetail(optionAbility, value));
+                optionAbilityMap.merge(slotName, new HashMap<String, Integer>(),(value, defaultMap) -> processEmblemDetail(optionAbility, value));
 
                 JSONArray emblems = (JSONArray) j.get("emblems");
 
@@ -589,7 +710,7 @@ public class AdminService {
             for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
                 emblemRateDto = new EmblemRateDto();
                 emblemRateDto.setEmblemName(el.getKey()); // detail Emblem Name
-                emblemRateDto.setEmblemColor(entry.getKey());
+                emblemRateDto.setEmblemColor(colorMap.get(entry.getKey()));
                 emblemRateDto.setRate(String.valueOf(el.getValue() + 1)); // 개별 카운트
                 emblemRateDto.setJobDetailSeq(prevDetailSeq);
                 detailCount += el.getValue(); // count
@@ -611,7 +732,7 @@ public class AdminService {
             for (Map.Entry<String, Integer> el : entry.getValue().entrySet()) {
                 optionAbilityDto = new OptionAbilityDto();
                 optionAbilityDto.setChoiceOption(el.getKey());
-                optionAbilityDto.setPartsName(entry.getKey()); // partsName
+                optionAbilityDto.setPartsName(partsMap.get(entry.getKey())); // partsName
                 optionAbilityDto.setRate(String.valueOf(el.getValue() + 1)); // 개별 카운트
                 optionAbilityDto.setJobDetailSeq(prevDetailSeq);
                 detailCount += el.getValue();
