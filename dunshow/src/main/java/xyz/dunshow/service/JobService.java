@@ -1,6 +1,7 @@
 package xyz.dunshow.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -23,11 +24,15 @@ public class JobService {
     private final JobDetailRepository jobDetailRepository;
     
     public List<JobDto> getJobList() {
-        return ObjectMapperUtils.mapList(this.jobRepository.findAll(), JobDto.class);
+        List<JobDto> list = ObjectMapperUtils.mapList(this.jobRepository.findAll(), JobDto.class);
+        list = list.stream().filter(j -> !"99".equals(j.getJobValue())).collect(Collectors.toList());
+        return list;
     }
     
     public List<JobDetailDto> getJobDetailList() {
-        return ObjectMapperUtils.mapList(this.jobDetailRepository.findAll(), JobDetailDto.class);
+        List<JobDetailDto> list = ObjectMapperUtils.mapList(this.jobDetailRepository.findAll(), JobDetailDto.class);
+        list = list.stream().filter(j -> !"99".equals(j.getJobValue())).collect(Collectors.toList());
+        return list;
     }
     
     public List<PartsDto> getPartsList() {

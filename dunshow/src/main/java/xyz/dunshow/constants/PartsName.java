@@ -16,7 +16,7 @@ public enum PartsName implements EnumCode {
 	PANTS("하의 아바타", "pants"),
 	BELT("허리 아바타", "belt"),
 	SHOES("신발 아바타", "shoes"),
-	SKIN("피부 아바타", "skin");
+	SKIN("스킨 아바타", "skin");
 
     public static final String CODE = "PARTS";
     private final String value;

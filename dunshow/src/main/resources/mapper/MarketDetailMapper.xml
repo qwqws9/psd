@@ -3,4 +3,7 @@
 
 <mapper namespace="xyz.dunshow.mapper.MarketDetailMapper">
 
+	<delete id="deleteAll">
+		DELETE FROM MARKET_DETAIL
+	</delete>
 </mapper>

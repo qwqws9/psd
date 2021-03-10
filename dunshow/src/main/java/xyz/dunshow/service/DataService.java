@@ -23,13 +23,19 @@ import xyz.dunshow.constants.Color;
 import xyz.dunshow.constants.PartsName;
 import xyz.dunshow.constants.Server;
 import xyz.dunshow.dto.InfoDto;
+import xyz.dunshow.dto.JobDto;
 import xyz.dunshow.dto.MarketDetailDto;
 import xyz.dunshow.dto.MarketMasterDto;
 import xyz.dunshow.entity.Job;
+import xyz.dunshow.entity.JobDetail;
 import xyz.dunshow.entity.MarketDetail;
 import xyz.dunshow.entity.MarketMaster;
 import xyz.dunshow.entity.OptionAbility;
 import xyz.dunshow.exception.BusinessException;
+import xyz.dunshow.mapper.MarketDetailMapper;
+import xyz.dunshow.mapper.MarketMasterMapper;
+import xyz.dunshow.repository.EmblemRepository;
+import xyz.dunshow.repository.JobDetailRepository;
 import xyz.dunshow.repository.JobRepository;
 import xyz.dunshow.repository.MarketDetailRepository;
 import xyz.dunshow.repository.MarketMasterRepository;
@@ -53,6 +59,16 @@ public class DataService {
     private final MarketDetailRepository marketDetailRepository;
     
     private final OptionAbilityRepository optionAbilityRepository;
+    
+    private final EmblemRepository emblemRepository;
+    
+    private final JobDetailRepository jobDetailRepository;
+    
+    private final MarketMasterMapper marketMasterMapper;
+    
+    private final MarketDetailMapper marketDetailMapper;
+    
+    private final JobService jobService;
 
     public Map<String, Object> getSearchDetail(String server, String characterId) {
         // 유효성 체크
@@ -175,13 +191,16 @@ public class DataService {
     @Transactional
 //    @CacheEvict(beforeInvocation = true, value = "")
     public void test() {
-    	this.marketDetailRepository.deleteAll();
-    	this.marketMasterRepository.deleteAll();
-    	List<Job> jobList = this.jobRepository.findAll();
+    	//this.marketDetailRepository.deleteAll();
+    	//this.marketMasterRepository.deleteAll();
+        this.marketDetailMapper.deleteAll();
+        this.marketMasterMapper.deleteAll();
+    	List<JobDto> jobList = this.jobService.getJobList();
     	StringBuilder sb = new StringBuilder();
     	String[] code = {"100", "110", "120", "130", "999"};
     	
-    	for (Job j : jobList) {
+    	long startTime = System.currentTimeMillis();
+    	for (JobDto j : jobList) {
     		if(StringUtils.isEmpty(j.getJobDesc())) { continue; }
     		
 
@@ -197,22 +216,31 @@ public class DataService {
         			sb.append("차 레어");
         		}
     			for (int k = 0; k < code.length; k++) {
-    				this.getMarket(EncodeUtil.encodeURIComponent(sb.toString()), j.getJobId(), code[k]);
+    				this.getMarket(EncodeUtil.encodeURIComponent(sb.toString()), j.getJobId(), code[k], j.getJobValue());
     			}
     		}
     	}
+    	long endTime = System.currentTimeMillis();
+    	
+    	System.out.println("총 걸린시간...");
+    	System.out.println((endTime - startTime) + "밀리초");
     }
     
     // 100, 110, 120, 130, 999
-    private void getMarket(String searchTitle, String jobId, String emblemCode) {
+    private void getMarket(String searchTitle, String jobId, String emblemCode, String jobValue) {
     	Map<String, String> colorMap = this.enumCodeUtil.getMap(Color.CODE);
     	Map<String, String> partsMap = this.enumCodeUtil.getMap(PartsName.CODE);
+    	List<JobDetail> list = this.jobDetailRepository.findByJobValue(jobValue);
+    	List<Integer> jobDetail = Lists.newArrayList();
+    	for (JobDetail j : list) {
+    	    jobDetail.add(j.getJobDetailSeq());
+    	}
     	
     	MarketMasterDto master;
     	MarketDetailDto detail;
     	List<MarketDetailDto> detailList;
     	String jacketOption = null;
-    	JSONObject rs = this.api.getMarket(searchTitle, emblemCode, EncodeUtil.encodeURIComponent("레어"), jobId, "front", "8", "8", "50");
+    	JSONObject rs = this.api.getMarket(searchTitle, emblemCode, EncodeUtil.encodeURIComponent("레어"), jobId, "front", "8", "9", "50");
     	JSONArray arr = (JSONArray) rs.get("rows");
     	
     	for (Object o : arr) {
@@ -220,6 +248,7 @@ public class DataService {
     		detailList = Lists.newArrayList();
     		
     	    JSONObject obj = (JSONObject) o;
+    	    master.setJobValue(jobValue);
     	    master.setEmblemCode(emblemCode);
     	    master.setTitle(obj.get("title").toString());
     	    master.setPrice(obj.get("price").toString());
@@ -231,9 +260,9 @@ public class DataService {
     	        JSONObject obj2 = (JSONObject) o2;
     	        detail.setSlotId(partsMap.get(obj2.get("slotName").toString())); // hair
     	        detail.setItemName(obj2.get("itemName").toString());
-    	        detail.setChoiceOption(obj2.get("optionAbility").toString());
+    	        detail.setChoiceOption(obj2.get("optionAbility") == null ? null : obj2.get("optionAbility").toString());
     	        
-    	        if ("jacket".equals(detail.getSlotId())) {
+    	        if ("coat".equals(detail.getSlotId())) {
     	            jacketOption = detail.getChoiceOption(); // 이걸로 먼저 JOB_VALUE 조회 후 정해서 하위옵들 조회
     	        }
     	        
@@ -251,8 +280,17 @@ public class DataService {
     	        detailList.add(detail);
     	    }
     	    
-    	    OptionAbility optionEntity = this.optionAbilityRepository.findByChoiceOption(jacketOption);
-    	    int jobDetailSeq = optionEntity == null ? 99 : optionEntity.getJobDetailSeq();
+    	    List<OptionAbility> optionEntity = this.optionAbilityRepository.findByChoiceOptionAndJobDetailSeqIn(jacketOption, jobDetail);
+    	    int jobDetailSeq = 99;
+    	    if (optionEntity != null) {
+    	        String prevRate = "0.0";
+    	        for (OptionAbility op : optionEntity) {
+    	            if (Double.parseDouble(prevRate) <= Double.parseDouble(op.getRate())) {
+    	                jobDetailSeq = op.getJobDetailSeq();
+    	            }
+    	            prevRate = op.getRate();
+    	        }
+    	    }
     	    master.setJobDetailSeq(jobDetailSeq);
     	    MarketMaster entityMst = this.marketMasterRepository.save(ObjectMapperUtils.map(master, MarketMaster.class));
     	    
@@ -264,9 +302,6 @@ public class DataService {
     	}
     }
     
-    private void dataProcess() {
-    	
-    }
     
     
     

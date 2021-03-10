@@ -8,6 +8,8 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import xyz.dunshow.constants.Color;
+import xyz.dunshow.constants.PartsName;
 import xyz.dunshow.constants.Server;
 import xyz.dunshow.interceptor.AuthenticationInterceptor;
 import xyz.dunshow.util.EnumCodeUtil;
@@ -37,6 +39,8 @@ public class WebConfig implements WebMvcConfigurer {
     public EnumCodeUtil enumCodeUtil() {
         EnumCodeUtil enumCodeUtil = new EnumCodeUtil();
         enumCodeUtil.put(Server.CODE, Server.class);
+        enumCodeUtil.put(Color.CODE, Color.class);
+        enumCodeUtil.put(PartsName.CODE, PartsName.class);
         return enumCodeUtil;
     }
 }

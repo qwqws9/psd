@@ -27,4 +27,6 @@ public class MarketMaster extends BaseEntity {
     private String price;
 	@Column
 	private String emblemCode;
+	@Column
+	private String jobValue;
 }

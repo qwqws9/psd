@@ -34,5 +34,6 @@
     	, JD.FOURTH_JOB
     	, JD.JOB_DETAIL_SEQ
     	FROM job j INNER JOIN job_detail jd ON j.JOB_VALUE = jd.JOB_VALUE
+    	WHERE j.JOB_VALUE != '99'
     </select>
 </mapper>

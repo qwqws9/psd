@@ -19,4 +19,5 @@ public class MarketMasterDto extends BaseDto {
     private int jobDetailSeq;
     private String price;
     private String emblemCode;
+    private String jobValue;
 }
