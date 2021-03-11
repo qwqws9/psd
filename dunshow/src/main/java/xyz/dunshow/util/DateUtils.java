@@ -20,6 +20,11 @@ public class DateUtils {
         return formatter.format(date);
     }
     
+    public static String getServerDate(Date date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        return formatter.format(date);
+    }
+    
     public static String getStringToDate(String date1) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         Date date = null;

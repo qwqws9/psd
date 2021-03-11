@@ -3,11 +3,14 @@ package xyz.dunshow.controller;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.util.UrlPathHelper;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Maps;
@@ -30,7 +33,7 @@ import xyz.dunshow.view.Views;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin")
-public class AdminController {
+public class AdminController extends BaseController{
 
     private final JobService jobService;
 
@@ -55,8 +58,11 @@ public class AdminController {
     @ResponseBody
     @JsonView(Views.Simple.class)
     public AjaxResponse data() {
+    	
         Map<String, Object> map = Maps.newHashMap();
-
+        map.put("data", "1234");
+//        System.out.println(super.getRequest().getHeader("Referer"));
+//        System.out.println(super.checkReferer("/admin/dataManage"));
         return new AjaxResponse(map);
     }
 

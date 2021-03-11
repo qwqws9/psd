@@ -2,6 +2,10 @@ package xyz.dunshow.constants;
 
 public class CacheKey {
 
-	public static final String FIND_ALL_SHOWROOM = "abcd";
+	public static final String FIND_ALL_SHOWROOM = "aaaa";
+	
+	public static boolean FIND_ALL_MARKET_ORDER = true;
+	public static final String FIND_ALL_MARKET_FRIST = "bbbb";
+	public static final String FIND_ALL_MARKET_SECOND = "cccc";
 	
 }

@@ -3,7 +3,138 @@
 
 <mapper namespace="xyz.dunshow.mapper.MarketMasterMapper">
 
-	<delete id="deleteAll">
-		DELETE FROM MARKET_MST
-	</delete>
+	<resultMap id="masterDto" type="xyz.dunshow.dto.MarketMasterDto">
+        <id property="marketMstSeq" column="MARKET_MST_SEQ" />
+        <result property="jobValue" column="JOB_VALUE" />
+        <result property="degree" column="DEGREE" />
+        <result property="emblemCode" column="EMBLEM_CODE" />
+        <result property="price" column="PRICE" />
+        <result property="title" column="TITLE" />
+        <result property="jobDetailSeq" column="JOB_DETAIL_SEQ" />
+        <collection property="details" ofType="xyz.dunshow.dto.MarketDetailDto">
+            <id property="marketDetailSeq" column="MARKET_DETAIL_SEQ" />
+            <result property="itemName" column="ITEM_NAME" />
+            <result property="slotId" column="SLOT_ID" />
+            <result property="choiceOption" column="CHOICE_OPTION" />
+            <result property="choiceOptionRate" column="CHOICE_OPTION_RATE" />
+            <result property="emblemName1" column="EMBLEM_NAME1" />
+            <result property="emblemName2" column="EMBLEM_NAME2" />
+            <result property="emblemName3" column="EMBLEM_NAME3" />
+            <result property="emblemRate1" column="EMBLEM_RATE1" />
+            <result property="emblemRate2" column="EMBLEM_RATE2" />
+            <result property="emblemRate3" column="EMBLEM_RATE3" />
+        </collection>
+    </resultMap>
+
+    <select id="selectAllMasterAndDetail1" resultMap="masterDto">
+        WITH E AS  (
+		    SELECT JOB_DETAIL_SEQ
+		    	 , RATE
+		         , EMBLEM_COLOR
+		         , EMBLEM_NAME
+		      FROM EMBLEM_RATE)
+		   , O AS  (
+		    SELECT PARTS_NAME
+		         , JOB_DETAIL_SEQ
+		         , CHOICE_OPTION
+		         , RATE
+		      FROM OPTION_ABILITY)
+
+			SELECT M.MARKET_MST_SEQ
+			     , D.MARKET_DETAIL_SEQ
+			     , M.JOB_VALUE
+			     , M.DEGREE
+	             , M.EMBLEM_CODE
+	             , M.PRICE
+	             , M.TITLE
+	             , D.SLOT_ID
+	             , D.ITEM_NAME
+	             , D.CHOICE_OPTION
+	             , M.JOB_DETAIL_SEQ
+	             , IFNULL((SELECT RATE
+	                         FROM O
+	                        WHERE O.PARTS_NAME = D.SLOT_ID
+	                          AND O.CHOICE_OPTION = D.CHOICE_OPTION
+	                          AND O.JOB_DETAIL_SEQ = M.JOB_DETAIL_SEQ), '0.0') CHOICE_OPTION_RATE
+	             , D.EMBLEM_NAME1
+	             , IFNULL((SELECT RATE
+	                         FROM E
+	                        WHERE E.EMBLEM_COLOR = D.EMBLEM_COLOR1
+	                          AND E.EMBLEM_NAME = D.EMBLEM_NAME1
+	                          AND E.JOB_DETAIL_SEQ = M.JOB_DETAIL_SEQ), '0.0') EMBLEM_RATE1
+	             , D.EMBLEM_NAME2
+	             , IFNULL((SELECT RATE
+	                         FROM E
+	                        WHERE E.EMBLEM_COLOR = D.EMBLEM_COLOR2
+	                          AND E.EMBLEM_NAME = D.EMBLEM_NAME2
+	                          AND E.JOB_DETAIL_SEQ = M.JOB_DETAIL_SEQ), '0.0') EMBLEM_RATE2
+	             , D.EMBLEM_NAME3
+	             , IFNULL((SELECT RATE
+	                         FROM E
+	                        WHERE E.EMBLEM_COLOR = D.EMBLEM_COLOR3
+	                          AND E.EMBLEM_NAME = D.EMBLEM_NAME3
+	                          AND E.JOB_DETAIL_SEQ = M.JOB_DETAIL_SEQ), '0.0') EMBLEM_RATE3
+			  FROM MARKET_MST M 
+			 INNER JOIN MARKET_DETAIL D
+			    ON M.MARKET_MST_SEQ = D.MARKET_MST_SEQ
+			 ORDER BY M.PRICE, M.JOB_DETAIL_SEQ
+    </select>
+    
+    <select id="selectAllMasterAndDetail2" resultMap="masterDto">
+        WITH E AS  (
+		    SELECT JOB_DETAIL_SEQ
+		    	 , RATE
+		         , EMBLEM_COLOR
+		         , EMBLEM_NAME
+		      FROM EMBLEM_RATE)
+		   , O AS  (
+		    SELECT PARTS_NAME
+		         , JOB_DETAIL_SEQ
+		         , CHOICE_OPTION
+		         , RATE
+		      FROM OPTION_ABILITY)
+
+			SELECT M.MARKET_MST_SEQ
+			     , D.MARKET_DETAIL_SEQ
+			     , M.JOB_VALUE
+			     , M.DEGREE
+	             , M.EMBLEM_CODE
+	             , M.PRICE
+	             , M.TITLE
+	             , D.SLOT_ID
+	             , D.ITEM_NAME
+	             , D.CHOICE_OPTION
+	             , M.JOB_DETAIL_SEQ
+	             , IFNULL((SELECT RATE
+	                         FROM O
+	                        WHERE O.PARTS_NAME = D.SLOT_ID
+	                          AND O.CHOICE_OPTION = D.CHOICE_OPTION
+	                          AND O.JOB_DETAIL_SEQ = M.JOB_DETAIL_SEQ), '0.0') CHOICE_OPTION_RATE
+	             , D.EMBLEM_NAME1
+	             , IFNULL((SELECT RATE
+	                         FROM E
+	                        WHERE E.EMBLEM_COLOR = D.EMBLEM_COLOR1
+	                          AND E.EMBLEM_NAME = D.EMBLEM_NAME1
+	                          AND E.JOB_DETAIL_SEQ = M.JOB_DETAIL_SEQ), '0.0') EMBLEM_RATE1
+	             , D.EMBLEM_NAME2
+	             , IFNULL((SELECT RATE
+	                         FROM E
+	                        WHERE E.EMBLEM_COLOR = D.EMBLEM_COLOR2
+	                          AND E.EMBLEM_NAME = D.EMBLEM_NAME2
+	                          AND E.JOB_DETAIL_SEQ = M.JOB_DETAIL_SEQ), '0.0') EMBLEM_RATE2
+	             , D.EMBLEM_NAME3
+	             , IFNULL((SELECT RATE
+	                         FROM E
+	                        WHERE E.EMBLEM_COLOR = D.EMBLEM_COLOR3
+	                          AND E.EMBLEM_NAME = D.EMBLEM_NAME3
+	                          AND E.JOB_DETAIL_SEQ = M.JOB_DETAIL_SEQ), '0.0') EMBLEM_RATE3
+			  FROM MARKET_MST M 
+			 INNER JOIN MARKET_DETAIL D
+			    ON M.MARKET_MST_SEQ = D.MARKET_MST_SEQ
+			 ORDER BY M.PRICE, M.JOB_DETAIL_SEQ
+    </select>
+
+    <delete id="deleteAll">
+        DELETE FROM MARKET_MST
+    </delete>
 </mapper>

@@ -1,5 +1,7 @@
 package xyz.dunshow.dto;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -14,10 +16,13 @@ import xyz.dunshow.view.Views;
 @JsonView(Views.Simple.class)
 public class MarketMasterDto extends BaseDto {
 
-    private int martketMstSeq;
+    private int marketMstSeq;
     private String title;
     private int jobDetailSeq;
     private String price;
     private String emblemCode;
     private String jobValue;
+    private String degree;
+    
+    private List<MarketDetailDto> details;
 }

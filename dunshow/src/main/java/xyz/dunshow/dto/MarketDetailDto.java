@@ -25,4 +25,10 @@ public class MarketDetailDto extends BaseDto {
     private String emblemColor2;
     private String emblemName3;
     private String emblemColor3;
+    
+    private String emblemRate1;
+    private String emblemRate2;
+    private String emblemRate3;
+    private String choiceOptionRate;
+    
 }

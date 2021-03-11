@@ -190,7 +190,7 @@ public class DataService {
     // 데이터 초기화시 ALTER TABLE [TABLE명] AUTO_INCREMENT = [시작할 값]; mst, detail seq 초기화 시켜주기
     @Transactional
 //    @CacheEvict(beforeInvocation = true, value = "")
-    public void test() {
+    public void initMarketMaster() {
     	//this.marketDetailRepository.deleteAll();
     	//this.marketMasterRepository.deleteAll();
         this.marketDetailMapper.deleteAll();
@@ -216,7 +216,7 @@ public class DataService {
         			sb.append("차 레어");
         		}
     			for (int k = 0; k < code.length; k++) {
-    				this.getMarket(EncodeUtil.encodeURIComponent(sb.toString()), j.getJobId(), code[k], j.getJobValue());
+    				this.getMarket(EncodeUtil.encodeURIComponent(sb.toString()), j.getJobId(), code[k], j.getJobValue(), i+"");
     			}
     		}
     	}
@@ -227,7 +227,7 @@ public class DataService {
     }
     
     // 100, 110, 120, 130, 999
-    private void getMarket(String searchTitle, String jobId, String emblemCode, String jobValue) {
+    private void getMarket(String searchTitle, String jobId, String emblemCode, String jobValue, String degree) {
     	Map<String, String> colorMap = this.enumCodeUtil.getMap(Color.CODE);
     	Map<String, String> partsMap = this.enumCodeUtil.getMap(PartsName.CODE);
     	List<JobDetail> list = this.jobDetailRepository.findByJobValue(jobValue);
@@ -248,6 +248,7 @@ public class DataService {
     		detailList = Lists.newArrayList();
     		
     	    JSONObject obj = (JSONObject) o;
+    	    master.setDegree(degree);
     	    master.setJobValue(jobValue);
     	    master.setEmblemCode(emblemCode);
     	    master.setTitle(obj.get("title").toString());
@@ -302,7 +303,9 @@ public class DataService {
     	}
     }
     
-    
+    public void test() {
+    	
+    }
     
     
     

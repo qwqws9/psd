@@ -3,9 +3,11 @@
     layout:decorate="~{layout/base}">
 
 <div layout:fragment="content">
-<!-- 	<p th:text="${email}"></p> -->
-<!-- 	<p th:text="${sub}"></p> -->
-<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 95%" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">Animated</div>
+	<p th:text="${time}"></p>
+	<p>요청하신 화면은 데이터 초기화중입니다. 잠시 후 시도해주세요.</p>
+	<p>약 5 ~ 10분 정도 소요됩니다.</p>
+	
+	<p>바로 사용가능한 메뉴는 다음과 같습니다.</p>
 </div>
 
 <th:block layout:fragment="script">
