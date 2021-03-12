@@ -45,11 +45,23 @@
 												<div class="tab-content detailContent">
 													<th:block th:each="jobDetail : ${jobDetailList}" th:if="${item.jobValue == jobDetail.jobValue}">
 														<div th:attr="class='tab-pane fade',id='jobDetail_' + ${jobDetail.jobDetailSeq}" role="tabpanel">
+														딜 플티
+														<hr class="my-2">
 															<div class="platinum">
 																<ul class="list-unstyled mb-0"></ul>
 															</div>
-															<hr>
-															<div class="row">
+<!-- 															<hr> -->
+															<div class="row" style="padding-top: 30px;">
+																<div class="col-md-1">
+																	부위
+																</div>
+																<div class="col-md-5">
+																	선택옵션
+																</div>
+																<div class="col-md-6">
+																	엠블렘
+																</div>
+																<hr class="my-2">
 																<div class="col-md-1">
 																	머리
 																</div>
@@ -170,7 +182,7 @@
 		show.data.options = {};
 		
 	    $.ajax({
-			url : '/avatar/ability.ajax',
+			url : '/data/ability.ajax',
 			data : {
 			},
 			success : function(res) {
@@ -234,9 +246,9 @@
 		$.each(data, function(index, item) {
 			var temp = data[index];
 			var seq = temp.jobDetailSeq;
-			var name = temp.partsName;
+			var name = temp.choiceOption;
 			
-			$('#jobDetail_' + seq + ' .option_' + temp.choiceOption + ' ul').append('<li>' + name + ' -> ' + temp.rate + '%</li>');
+			$('#jobDetail_' + seq + ' .option_' + temp.partsName + ' ul').append('<li>' + name + ' -> ' + temp.rate + '%</li>');
 		});
 		
 		$('.detailContent li:nth-child(1)').attr('style', 'font-weight:bold');

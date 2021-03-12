@@ -32,6 +32,9 @@ public class CommandLineAppStartupRunner implements CommandLineRunner{
 		System.out.println();
 		System.out.println("스케줄 관리는 Task.java 확인");
 		System.out.println();
+
+		// 옵션조회
+		this.avatarService.getCorrectOption();
 		// 마켓데이터 초기화
 		//this.marketMasterMapper.selectAllMasterAndDetail1();
 //		this.avatarService.getAllAvatarList();

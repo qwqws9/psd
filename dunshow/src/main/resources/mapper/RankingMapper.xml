@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="xyz.dunshow.mapper.RankingMapper">
+
+	<delete id="deleteMinPriceOfJobValue" parameterType="string">
+	DELETE FROM ranking WHERE ranking_seq = (
+SELECT R.ranking_seq FROM (
+SELECT ranking_seq ,MIN(price) FROM ranking WHERE job_value = #{value}) R)
+	</delete>
+	
+	<select id="selectAll">
+		SELECT * FROM ranking
+		ORDER BY price DESC
+	</select>
+</mapper>

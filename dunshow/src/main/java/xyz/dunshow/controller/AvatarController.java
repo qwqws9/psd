@@ -41,6 +41,8 @@ public class AvatarController {
     private final OpenApiService openApiService;
 
     private final DataService dataService;
+    
+//    private final 
 
     /**
      *  showroom 페이지조회
@@ -130,6 +132,7 @@ public class AvatarController {
 
         Map<String, Object> map = this.dataService.getSearchDetail(serverId, characterId);
 
+        String jobValue = map.get("jobValue").toString();
         model.addAttribute("data", map.get("data"));
         model.addAttribute("totalPrice", map.get("totalPrice"));
         model.addAttribute("totalAverage", map.get("totalAverage"));
@@ -138,24 +141,4 @@ public class AvatarController {
         return "search/detail";
     }
 
-    @RequestMapping("/option/ability")
-    public String ability(Model model) {
-        model.addAttribute("jobList", this.jobService.getJobList());
-        model.addAttribute("partsList", this.jobService.getPartsList());
-        model.addAttribute("jobDetailList", this.jobService.getJobDetailList());
-        return "/option/ability";
-    }
-    
-    @GetMapping("/ability.ajax")
-    @ResponseBody
-    @JsonView(Views.Simple.class)
-    public AjaxResponse test2(String jobSeq) {
-        Map<String, Object> map = Maps.newHashMap();
-
-        map.put("data", this.avatarService.getCorrectOption());
-        
-        
-        
-        return new AjaxResponse(map);
-    }
 }

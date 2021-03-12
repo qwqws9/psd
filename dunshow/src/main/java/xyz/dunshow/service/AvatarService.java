@@ -53,16 +53,12 @@ public class AvatarService {
         return list;
     }
 
+    @Cacheable(value = CacheKey.FIND_ALL_CORRECT_OPTION)
     public InfoDto getCorrectOption() {
-//        List<EmblemRate> emblems = this.emblemRateRepository.findAll(Sort.by(Order.asc("jobDetailSeq"), Order.desc("rate")));
-//        List<OptionAbility> options = this.optionAbilityRepository.findAll(Sort.by(Order.asc("jobDetailSeq"), Order.desc("rate")));
-//        info.setEmblemRates(ObjectMapperUtils.mapList(emblems, EmblemRateDto.class));
-//        info.setOptionAbilitys(ObjectMapperUtils.mapList(options, OptionAbilityDto.class));
     	InfoDto info = new InfoDto();
-    	
     	info.setEmblemRates(this.emblemRateMapper.selectAll());
     	info.setOptionAbilitys(this.optionAbilityMapper.selectAll());
-    	
+
         return info;
     }
 }

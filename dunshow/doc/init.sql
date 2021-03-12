@@ -109,7 +109,16 @@ CREATE TABLE market_detail (
 	FOREIGN KEY (MARKET_MST_SEQ) REFERENCES market_mst (MARKET_MST_SEQ)
 ) ENGINE=INNODB DEFAULT CHARSET=UTF8;
 
-
+# 2021-03-12 테이블 <신규>
+CREATE TABLE ranking (
+	RANKING_SEQ INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	SERVER_NAME VARCHAR(20) NOT NULL,
+	CHARACTER_NAME VARCHAR(50) NOT NULL,
+	CHARACTER_ID VARCHAR(50) NOT NULL,
+	JOB_VALUE VARCHAR(10) NOT NULL,
+	PRICE VARCHAR(100) NULL,
+	FOREIGN KEY (JOB_VALUE) REFERENCES job_detail (JOB_VALUE)
+) ENGINE=INNODB DEFAULT CHARSET=UTF8;
 
 
 
@@ -160,6 +169,51 @@ INSERT INTO job_detail (JOB_DETAIL_SEQ, FIRST_JOB, SECOND_JOB, THIRD_JOB, FOURTH
 
 
 
+
+# 랭킹 테스트 쿼리
+WITH T AS (
+	SELECT '1000' AS price, 'A' AS c_name, '1' AS job_value
+	UNION ALL
+	SELECT '1100' AS price, 'Q' AS c_name, '1' AS job_value
+	UNION ALL
+	SELECT '1200' AS price, 'W' AS c_name, '1' AS job_value
+	UNION ALL
+	SELECT '5312' AS price, 'E' AS c_name, '1' AS job_value
+	UNION ALL
+	SELECT '4323' AS price, 'R' AS c_name, '1' AS job_value
+	UNION ALL
+	SELECT '4521' AS price, 'T' AS c_name, '2' AS job_value
+	UNION ALL
+	SELECT '4964' AS price, 'Y' AS c_name, '2' AS job_value
+	UNION ALL
+	SELECT '9472' AS price, 'U' AS c_name, '2' AS job_value
+	UNION ALL
+	SELECT '6372' AS price, 'I' AS c_name, '2' AS job_value
+	UNION ALL
+	SELECT '6842' AS price, 'O' AS c_name, '2' AS job_value
+	UNION ALL
+	SELECT '4593' AS price, 'S' AS c_name, '3' AS job_value
+	UNION ALL
+	SELECT '3457' AS price, 'D' AS c_name, '3' AS job_value
+	UNION ALL
+	SELECT '2357' AS price, 'F' AS c_name, '3' AS job_value
+	UNION ALL
+	SELECT '5473' AS price, 'G' AS c_name, '3' AS job_value
+	UNION ALL
+	SELECT '5768' AS price, 'H' AS c_name, '3' AS job_value
+	UNION ALL
+	SELECT '8853' AS price, 'J' AS c_name, '4' AS job_value
+	UNION ALL
+	SELECT '6455' AS price, 'K' AS c_name, '4' AS job_value
+	UNION ALL
+	SELECT '3442' AS price, 'X' AS c_name, '4' AS job_value
+	UNION ALL
+	SELECT '9876' AS price, 'W' AS c_name, '4' AS job_value
+)
+SELECT T.* FROM (
+SELECT job_value, c_name,SUM(price) total FROM T
+GROUP BY job_value, c_name WITH ROLLUP) T
+ORDER BY job_value, total desc
 
 
 

@@ -8,4 +8,8 @@ public class CacheKey {
 	public static final String FIND_ALL_MARKET_FRIST = "bbbb";
 	public static final String FIND_ALL_MARKET_SECOND = "cccc";
 	
+	public static final String FIND_ALL_CORRECT_OPTION = "dddd";
+	
+	
+	
 }

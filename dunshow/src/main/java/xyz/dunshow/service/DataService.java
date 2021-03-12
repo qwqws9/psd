@@ -115,7 +115,10 @@ public class DataService {
             list.add(look);
         }
 
-        return getAuctionList(list);
+        Map<String, Object> result = getAuctionList(list);
+        result.put("jobValue", this.jobRepository.findByJobName(rs.get("jobName").toString()).getJobValue());
+
+        return result;
     }
     
     public Map<String, Object> getAuctionList(List<InfoDto> list) {
