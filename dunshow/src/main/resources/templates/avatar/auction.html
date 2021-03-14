@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/base}">
+
+<div layout:fragment="content" class="container-fluid p-0">
+	
+</div>
+
+
+<th:block layout:fragment="script">
+<script type="text/javascript">
+	$(document).ready(function () {
+		initData();
+	});
+	
+	function initData() {
+		show.data = {};
+		show.data.jobs = {};
+		show.prev = {};
+		show.prev.choice = [];
+		show.prev.src = [];
+		
+	    $.ajax({
+			url : '/data/auction.ajax',
+			data : {
+			},
+			success : function(res) {
+// 				$('#targetImage').attr('src', 'http://avatarsync.df.nexon.com/wear/image/stand@2x.png?wearInfo=%7B%22job%22:%22'+jobSeq+'%22,%22level%22:0,%22hair%22:null,%22cap%22:null,%22face%22:null,%22neck%22:null,%22coat%22:null,%22belt%22:null,%22pants%22:null,%22shoes%22:null,%22skin%22:null,%22weapon1%22:null,%22package%22:null,%22animation%22:%22Stand%22%7D');
+// 				var parts = res.data.data;
+// 				var i;
+				var detail = res.data.data;
+				show.data.test = res.data.outer;
+				console.log(res);
+				for (i = 0; i < detail.length; i++) {
+					if (!show.data.jobs.hasOwnProperty(detail[i].jobValue)) {
+						show.data.jobs[detail[i].jobValue] = {};
+					}
+					if (!show.data.jobs[detail[i].jobValue][jobDetail].hasOwnProperty(detail[i].jobDetail)) {
+						show.data.jobs[detail[i].jobValue][jobDetail][detail[i].jobDetail] = {};
+					}
+					show.data.jobs[detail[i].jobValue][jobDetail] = {};
+				}
+			}
+		})
+	}
+</script>
+</th:block>
+
+</html>

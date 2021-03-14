@@ -38,6 +38,7 @@ public class Task {
 
 	// 서버 시작하고 약 41분 후 부터 5분 간격으로 초기화
 //	@Scheduled(fixedDelay = 300000, initialDelay = 2500000)
+//	@Scheduled(fixedDelay = 300000)
 	public void task1() {
 		System.out.println("마켓 캐시 초기화 시작");
 		// Market 데이터 초기화

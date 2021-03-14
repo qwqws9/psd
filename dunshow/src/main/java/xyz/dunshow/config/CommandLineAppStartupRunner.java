@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import xyz.dunshow.constants.ApiKey;
 import xyz.dunshow.mapper.MarketMasterMapper;
 import xyz.dunshow.service.AvatarService;
+import xyz.dunshow.service.DataService;
 import xyz.dunshow.util.DateUtils;
 import xyz.dunshow.util.ServerUtil;
 
@@ -19,6 +20,8 @@ public class CommandLineAppStartupRunner implements CommandLineRunner{
 	private final AvatarService avatarService;
 	
 	private final MarketMasterMapper marketMasterMapper;
+	
+	private final DataService dataService;
 	
 	@Override
 	public void run(String... args) throws Exception {
@@ -36,7 +39,8 @@ public class CommandLineAppStartupRunner implements CommandLineRunner{
 		// 옵션조회
 		this.avatarService.getCorrectOption();
 		// 마켓데이터 초기화
-		//this.marketMasterMapper.selectAllMasterAndDetail1();
+//		this.dataService.initMarketMaster();
+		this.marketMasterMapper.selectAllMasterAndDetail1();
 //		this.avatarService.getAllAvatarList();
 		
 		System.out.println("서버 데이터 준비가 완료되었습니다.");
