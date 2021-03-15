@@ -10,4 +10,6 @@ import xyz.dunshow.entity.Ranking;
 public interface RankingRepository extends JpaRepository<Ranking, Integer>{
 
 	List<Ranking> findByJobValue(String jobValue, Sort sort);
+	
+	List<Ranking> findByCharacterId(String characterId);
 }

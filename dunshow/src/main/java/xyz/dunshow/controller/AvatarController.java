@@ -27,6 +27,7 @@ import xyz.dunshow.service.AvatarService;
 import xyz.dunshow.service.DataService;
 import xyz.dunshow.service.JobService;
 import xyz.dunshow.service.OpenApiService;
+import xyz.dunshow.service.RankingService;
 import xyz.dunshow.view.Views;
 
 @Controller
@@ -132,7 +133,6 @@ public class AvatarController {
 
         Map<String, Object> map = this.dataService.getSearchDetail(serverId, characterId);
 
-        String jobValue = map.get("jobValue").toString();
         model.addAttribute("data", map.get("data"));
         model.addAttribute("totalPrice", map.get("totalPrice"));
         model.addAttribute("totalAverage", map.get("totalAverage"));

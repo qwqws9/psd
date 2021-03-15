@@ -34,6 +34,7 @@ import xyz.dunshow.service.AvatarService;
 import xyz.dunshow.service.DataService;
 import xyz.dunshow.service.JobService;
 import xyz.dunshow.service.OpenApiService;
+import xyz.dunshow.util.ServerUtil;
 import xyz.dunshow.view.Views;
 
 @Controller
@@ -84,7 +85,7 @@ public class DataController extends BaseController{
     @JsonView(Views.Simple.class)
     public AjaxResponse getAuction() {
         Map<String, Object> map = Maps.newHashMap();
-        map.put("data", this.avatarService.getCorrectOption());
+        map.put("marketDate", ServerUtil.MARKET_DATA_TIME);
 
         if (CacheKey.FIND_ALL_MARKET_ORDER) {
 //            map.put("data", this.marketMasterMapper.selectAllMasterAndDetail1());
@@ -97,16 +98,16 @@ public class DataController extends BaseController{
         Map<String, Map<String, Map<String, Map<String, List<MarketMasterDto>>>>> map2 = Maps.newHashMap();
         
         for (MarketMasterDto m : list) {
-            Map<String, Map<String, Map<String, List<MarketMasterDto>>>> jobMap = map2.getOrDefault(m.getJobValue(), new HashMap<String, Map<String,Map<String,List<MarketMasterDto>>>>());
-            Map<String, Map<String, List<MarketMasterDto>>> detailMap = jobMap.getOrDefault(m.getJobDetailSeq()+"", new HashMap<String, Map<String,List<MarketMasterDto>>>());
-            Map<String, List<MarketMasterDto>> degreeMap = detailMap.getOrDefault(m.getDegree(), new HashMap<String, List<MarketMasterDto>>());
-            List<MarketMasterDto> innerList = degreeMap.getOrDefault(m.getEmblemCode(), new ArrayList<MarketMasterDto>());
+            Map<String, Map<String, Map<String, List<MarketMasterDto>>>> jobMap = map2.getOrDefault("B"+m.getJobValue(), new HashMap<String, Map<String,Map<String,List<MarketMasterDto>>>>());
+            Map<String, Map<String, List<MarketMasterDto>>> detailMap = jobMap.getOrDefault("D"+m.getJobDetailSeq(), new HashMap<String, Map<String,List<MarketMasterDto>>>());
+            Map<String, List<MarketMasterDto>> degreeMap = detailMap.getOrDefault("G"+m.getDegree(), new HashMap<String, List<MarketMasterDto>>());
+            List<MarketMasterDto> innerList = degreeMap.getOrDefault("E"+m.getEmblemCode(), new ArrayList<MarketMasterDto>());
             
             innerList.add(m);
-            degreeMap.putIfAbsent(m.getEmblemCode(), innerList);
-            detailMap.putIfAbsent(m.getDegree(), degreeMap);
-            jobMap.putIfAbsent(m.getJobDetailSeq()+"", detailMap);
-            map2.putIfAbsent(m.getJobValue(), jobMap);
+            degreeMap.putIfAbsent("E"+m.getEmblemCode(), innerList);
+            detailMap.putIfAbsent("G"+m.getDegree(), degreeMap);
+            jobMap.putIfAbsent("D"+m.getJobDetailSeq()+"", detailMap);
+            map2.putIfAbsent("B"+m.getJobValue(), jobMap);
         }
         
         map.put("outer", map2);

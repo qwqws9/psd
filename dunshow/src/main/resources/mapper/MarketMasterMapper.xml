@@ -77,7 +77,7 @@
 			  FROM MARKET_MST M 
 			 INNER JOIN MARKET_DETAIL D
 			    ON M.MARKET_MST_SEQ = D.MARKET_MST_SEQ
-			 ORDER BY M.PRICE, M.JOB_DETAIL_SEQ
+			 ORDER BY M.DEGREE, M.EMBLEM_CODE, M.PRICE, M.JOB_DETAIL_SEQ
     </select>
     
     <select id="selectAllMasterAndDetail2" resultMap="masterDto">
@@ -131,7 +131,7 @@
 			  FROM MARKET_MST M 
 			 INNER JOIN MARKET_DETAIL D
 			    ON M.MARKET_MST_SEQ = D.MARKET_MST_SEQ
-			 ORDER BY M.PRICE, M.JOB_DETAIL_SEQ
+			 ORDER BY M.DEGREE, M.EMBLEM_CODE, M.PRICE, M.JOB_DETAIL_SEQ
     </select>
 
     <delete id="deleteAll">

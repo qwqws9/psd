@@ -26,6 +26,7 @@ import xyz.dunshow.dto.InfoDto;
 import xyz.dunshow.dto.JobDto;
 import xyz.dunshow.dto.MarketDetailDto;
 import xyz.dunshow.dto.MarketMasterDto;
+import xyz.dunshow.dto.RankingDto;
 import xyz.dunshow.entity.Job;
 import xyz.dunshow.entity.JobDetail;
 import xyz.dunshow.entity.MarketDetail;
@@ -69,7 +70,10 @@ public class DataService {
     private final MarketDetailMapper marketDetailMapper;
     
     private final JobService jobService;
-
+    
+    private final RankingService rankingService;
+    
+    
     public Map<String, Object> getSearchDetail(String server, String characterId) {
         // 유효성 체크
         if (StringUtils.isEmpty(this.enumCodeUtil.get(Server.CODE, server))) {
@@ -116,7 +120,13 @@ public class DataService {
         }
 
         Map<String, Object> result = getAuctionList(list);
-        result.put("jobValue", this.jobRepository.findByJobName(rs.get("jobName").toString()).getJobValue());
+        RankingDto rank = new RankingDto();
+        rank.setCharacterId(characterId);
+        rank.setJobValue(this.jobRepository.findByJobName(rs.get("jobName").toString()).getJobValue());
+        rank.setCharacterName(rs.get("characterName").toString());
+        rank.setServerName(this.enumCodeUtil.get(Server.CODE, server));
+        rank.setPrice(result.get("rankingPrice").toString());
+        this.rankingService.insert(rank);
 
         return result;
     }
@@ -185,7 +195,7 @@ public class DataService {
         map.put("data", list);
         map.put("totalPrice", "최저가 합계 : " + format.format(totalPrice) + " 골드");
         map.put("totalAverage", "평균가 합계 : " + format.format(totalAverage) + " 골드");
-        
+        map.put("rankingPrice", totalAverage+"");
         return map;
     }
     

@@ -1,18 +1,12 @@
 package xyz.dunshow.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import lombok.RequiredArgsConstructor;
 import xyz.dunshow.dto.RankingDto;
@@ -28,35 +22,25 @@ public class RankingService {
     
     private final RankingRepository rankingRepository;
     
-    public void select() {
-    	List<RankingDto> list = this.rankingMapper.selectAll();
-    	Map<String, List<RankingDto>> map = Maps.newHashMap();
-    	List<RankingDto> rank = Lists.newArrayList();
-    	
-    	
-    	for (RankingDto r : list) {
-    		if (rank.size() != 5) {
-    			rank.add(r);
-    		}
-    		
-    		List<RankingDto> l = map.getOrDefault(r.getJobValue(), new ArrayList<RankingDto>());
-    		l.add(r);
-    		map.putIfAbsent(r.getJobValue(), l);
-    	}
-    	
-    	for (Entry<String, List<RankingDto>> entry : map.entrySet()) {
-    		for (RankingDto r : entry.getValue()) {
-    			r.getPrice();
-    		}
-    	}
+    public List<RankingDto> select() {
+    	return this.rankingMapper.selectAll();
     }
     
     @Transactional
-    public void insert(RankingDto param) {
-    	// 현재 데이터 중복으로 들어감. 조회 후 현재 등록된 가격보다 낮으면 return
-    	List<Ranking> entity = this.rankingRepository.findByJobValue(param.getJobValue(), Sort.by(Order.asc("price")));
+    public boolean insert(RankingDto param) {
+    	List<Ranking> duplEntity = this.rankingRepository.findByCharacterId(param.getCharacterId());
     	
-    	if (entity == null || entity.size() < 5) {
+    	for (Ranking r : duplEntity) {
+    		int p = Integer.parseInt(r.getPrice());
+    		int s = Integer.parseInt(param.getPrice());
+    		// -5% ~ +5% 제외
+    		if ((p * 0.95) <= s && s <= (p * 1.05)) {
+    			return false;
+    		}
+    	}
+    	
+    	List<Ranking> entity = this.rankingRepository.findByJobValue(param.getJobValue(), Sort.by(Order.asc("price")));
+    	if (entity == null || entity.size() <= 10) {
     		this.rankingRepository.save(param.toEntity(Ranking.class));
     	} else {
     		for (Ranking r : entity) {
@@ -67,5 +51,7 @@ public class RankingService {
     			}
     		}
     	}
+    	
+    	return true;
     }
 }

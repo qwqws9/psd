@@ -41,6 +41,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner{
 		// 마켓데이터 초기화
 //		this.dataService.initMarketMaster();
 		this.marketMasterMapper.selectAllMasterAndDetail1();
+		ServerUtil.MARKET_DATA_TIME = DateUtils.getServerDate(new Date());
 //		this.avatarService.getAllAvatarList();
 		
 		System.out.println("서버 데이터 준비가 완료되었습니다.");

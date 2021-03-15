@@ -4,8 +4,64 @@
 
 <div layout:fragment="content" class="container-fluid p-0">
 	
-</div>
+	<!-- 왼 -->
+	<div class="row">
+	<div class="col-md-3 col-xl-2">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title mb-0" id="marketDate"></h5>
+			</div>
 
+			<div class="list-group list-group-flush" role="tablist" id="joblist">
+				<th:block th:each="item : ${jobList}">
+					<th:block th:if="${item.jobValue != '9' && item.jobValue != '10' } ">
+					<a data-toggle="list" th:attr="href='#target_' + ${item.jobValue}, id=((${item.jobValue} == 0) ? firstTarget), class=((${item.jobValue} == 0) ? 'list-group-item list-group-item-action show active' : 'list-group-item list-group-item-action')" role="tab" aria-selected="false" th:text="${item.jobValue}">
+			        </a>
+			        </th:block>
+				</th:block>
+			</div>
+		</div>
+	</div>
+	
+	<!-- 중간 -->
+	<div class="col-md-8 col-xl-9">
+	<div class="tab-content">
+							<th:block th:each="item : ${jobList}">
+								<div th:attr="class=((${item.jobValue} == 0) ? 'tab-pane fade active show' : 'tab-pane fade'), id='target_' + ${item.jobValue}" role="tabpanel">
+										<div class="card">
+											<div class="card-header">
+													<ul class="nav nav-pills card-header-pills pull-right" role="tablist">
+														<th:block th:each="jobDetail : ${jobDetailList}">
+															<li class="nav-item" th:if="${item.jobValue == jobDetail.jobValue}">
+																<a data-toggle="tab" th:attr="class='nav-link',href='#jobDetail_' + ${jobDetail.jobDetailSeq}" th:text="${jobDetail.jobDetailSeq}"></a>
+															</li>
+														</th:block>
+													</ul>
+											</div>
+											<div class="card-body">
+												<div class="tab-content">
+													<th:block th:each="jobDetail : ${jobDetailList}" th:if="${item.jobValue == jobDetail.jobValue}">
+														<div th:attr="class='tab-pane fade',id='jobDetail_' + ${jobDetail.jobDetailSeq}" role="tabpanel">
+															<div class="float-right mb-3">
+																<button class="btn btn-outline-info asc" th:attr="onclick=|detailSort('acc_D${jobDetail.jobDetailSeq}', 'degree', this)|">이름순</button>
+																<button class="btn btn-outline-info asc" th:attr="onclick=|detailSort('acc_D${jobDetail.jobDetailSeq}', 'price', this)|">가격순</button>
+																<button class="btn btn-outline-info asc" th:attr="onclick=|detailSort('acc_D${jobDetail.jobDetailSeq}', 'rate', this)|">비율순</button>
+															</div>
+															<div class="accordion" id="accordionExample" th:attr="id='acc_D' + ${jobDetail.jobDetailSeq}">
+																
+															</div>
+														
+														</div>
+													</th:block>
+												</div>
+												</div>
+												</div>
+												</div>
+												</th:block>
+												</div>
+												</div>
+</div>
+</div>
 
 <th:block layout:fragment="script">
 <script type="text/javascript">
@@ -29,18 +85,143 @@
 // 				var parts = res.data.data;
 // 				var i;
 				var detail = res.data.data;
-				show.data.test = res.data.outer;
+				show.data.outer = res.data.outer;
+				a();
+				$('#marketDate').text('갱신 : ' + res.data.marketDate);
 				console.log(res);
-				for (i = 0; i < detail.length; i++) {
-					if (!show.data.jobs.hasOwnProperty(detail[i].jobValue)) {
-						show.data.jobs[detail[i].jobValue] = {};
-					}
-					if (!show.data.jobs[detail[i].jobValue][jobDetail].hasOwnProperty(detail[i].jobDetail)) {
-						show.data.jobs[detail[i].jobValue][jobDetail][detail[i].jobDetail] = {};
-					}
-					show.data.jobs[detail[i].jobValue][jobDetail] = {};
-				}
+// 				for (i = 0; i < detail.length; i++) {
+// 					if (!show.data.jobs.hasOwnProperty(detail[i].jobValue)) {
+// 						show.data.jobs[detail[i].jobValue] = {};
+// 					}
+// 					if (!show.data.jobs[detail[i].jobValue][jobDetail].hasOwnProperty(detail[i].jobDetail)) {
+// 						show.data.jobs[detail[i].jobValue][jobDetail][detail[i].jobDetail] = {};
+// 					}
+// 					show.data.jobs[detail[i].jobValue][jobDetail] = {};
+// 				}
 			}
+		})
+	}
+	
+	// 100, 110, 120, 130, 999
+	var emblem = {
+		'100' : '없음',
+		'110' : '빛작',
+		'120' : '화작',
+		'130' : '찬작',
+		'999' : '혼합'
+	}
+	
+	function a() {
+		var html = [];
+		var detail = [];
+		var count = 0;
+		var totalRate = 0;
+		console.log('시작');
+		$.each(show.data.outer, function(i, item) {
+			$.each(show.data.outer[i], function(j, item2) {
+				$.each(show.data.outer[i][j],function(k, item3) {
+					$.each(show.data.outer[i][j][k], function(l, item4) {
+						$.each(item4, function(m, item5) {
+							html = [];
+							detail = [];
+							count = 0;
+							totalRate = 0;
+							$.each(item5.details, function(n, item6) {
+								detail.push(item6.itemName);
+								detail.push(item6.choiceOption);
+								detail.push(item6.choiceOptionRate);
+								detail.push(item6.emblemName1);
+								detail.push(item6.emblemName2);
+								detail.push(item6.emblemName3);
+								detail.push(item6.emblemRate1);
+								detail.push(item6.emblemRate2);
+								detail.push(item6.emblemRate3);
+								
+								item6.choiceOptionRate == '0.0' ? '' : count++;
+								item6.emblemRate1 == '0.0' ? '' : count++;
+								item6.emblemRate2 == '0.0' ? '' : count++;
+								item6.emblemRate3 == '0.0' ? '' : count++;
+								totalRate += ((Number(item6.choiceOptionRate) + Number(item6.emblemRate1) + Number(item6.emblemRate2) + Number(item6.emblemRate3)));
+							});
+							
+							html.push('<div class="card" data-price="'+item5.price+'" data-degree="'+item5.degree+'" data-rate="'+(Number(totalRate) / Number(count)).toFixed(2)+'">');
+							html.push('<div class="card-header" id="heading'+ item5.marketMstSeq +'">');
+							html.push('<h5 class="card-title my-2">');
+							html.push('<a href="#" data-toggle="collapse" data-target="#Detail'+item5.marketMstSeq+'" aria-expanded="true" aria-controls="collapse1" class="">');
+							html.push(item5.marketMstSeq);
+							html.push(item5.price);
+							html.push(emblem[item5.emblemCode]);
+							html.push('   비율 : ' + (Number(totalRate) / Number(count)).toFixed(2));
+							html.push('</a></h5></div>');
+							html.push('<div id="Detail'+item5.marketMstSeq+'" class="collapse" aria-labelledby="heading'+ item5.marketMstSeq +'" data-parent="#acc_'+ j +'" style="">');
+							html.push('<div class="card-body">');
+							html.push(detail.join(''));
+							html.push('</div></div></div>');
+							
+							$('#acc_D' + item5.jobDetailSeq).append(html.join(''));
+						});
+					});
+				})
+			});
+		});
+		console.log('끝');
+		// #acc_D
+// 		html.push('<div class="card">');
+// 		html.push('<div class="card-header" id="heading'+ item5.marketMstSeq +'">');
+// 		html.push('<h5 class="card-title my-2">');
+// 		html.push('<a href="#" data-toggle="collapse" data-target="#collapse1" aria-expanded="true" aria-controls="collapse1" class="">');
+// 		html.push('데이터 가져오기 (UrlConnection -> DB)');
+// 		html.push('</a></h5></div>');
+// 		html.push('<div id="collapse1" class="collapse" aria-labelledby="heading1" data-parent="#accordionExample" style="">');
+// 		html.push('<div class="card-body">');
+// 		html.push('body contents');
+// 		html.push('</div></div></div>');
+	}
+	
+	
+	function detailSort(target, sortNm, obj) {
+		var $sortObj = $('#'+target+' .card').get();
+		var valueA, valueB;
+		var sortStat;
+		
+		if ($(obj).hasClass('asc')) {
+			sortStat = 'asc';
+			$(obj).removeClass('asc').addClass('desc');
+		} else {
+			sortStat = 'desc';
+			$(obj).removeClass('desc').addClass('asc');
+		}
+		
+		$sortObj.sort(function(a,b) {
+			valueA = $(a).data(sortNm);
+			valueB = $(b).data(sortNm);
+			
+			if (valueA === valueB) {
+				if (sortNm != 'price') {
+					var tempA = $(a).data('price');
+					var tempB = $(b).data('price');
+					
+					if (tempA == tempB) {
+						return 0;
+					} else {
+						return parseInt(tempA) - parseInt(tempB);
+					}
+				}
+				return 0;
+			} else if (valueA == null) {
+				return 1;
+			} else if (valueB == null) {
+				return -1;
+			} else if (sortStat == 'asc') {
+				return parseInt(valueA) - parseInt(valueB);
+			} else {
+				return parseInt(valueB) - parseInt(valueA);
+			}
+		});
+		
+		$.each($sortObj, function(index, row) {
+			console.log(row);
+			$('#'+target).append(row);
 		})
 	}
 </script>
