@@ -8,6 +8,7 @@
 	<link rel="shortcut icon" th:href="@{/img/icons/icon-48x48.png}" />
 	<link rel="stylesheet" th:href="@{/css/app.css}" >
 	<link rel="stylesheet" th:href="@{/css/error.css}" >
+	<link rel="stylesheet" th:href="@{/css/custom.css}" >
 <!-- 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Encode+Sans+Semi+Condensed:100,200,300,400"> -->
 	    <title>base.html</title>
 <!--     <link rel="shortcut icon" th:href="@{/img/favicon.ico}"> -->
@@ -52,6 +53,11 @@
             alert(request.responseJSON.message);
         }
     });
+    
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     </script>
     
 

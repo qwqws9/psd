@@ -217,6 +217,17 @@ ORDER BY job_value, total desc
 
 
 
+WITH T AS (
+	SELECT * FROM market_mst
+	GROUP BY title
+)
+SELECT *
+FROM market_detail m LEFT JOIN t ON m.market_mst_seq = t.market_mst_seq
+WHERE title IS NOT NULL
+;
+
+// showroom 인덱스 찾아서 src 저장해두기
+
 
 #ALTER TABLE usr CONVERT TO CHARSET utf8;
 #ALTER TABLE show_room CONVERT TO CHARSET utf8;

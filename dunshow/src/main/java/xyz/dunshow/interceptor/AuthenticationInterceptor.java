@@ -21,7 +21,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     	// 캐시데이터 생성하는동안 접근못하게 캐시사용하는 컨트롤러 접근막기
     	if (!ServerUtil.SERVER_STARTING) {
     		String rq = request.getRequestURI();
-    		if (rq.startsWith("/admin")) {
+    		if (rq.startsWith("/data")) {
     			response.sendRedirect("/start");
     			return false;
     		}

@@ -15,7 +15,7 @@
 			<div class="list-group list-group-flush" role="tablist" id="joblist">
 				<th:block th:each="item : ${jobList}">
 					<th:block th:if="${item.jobValue != '9' && item.jobValue != '10' } ">
-					<a data-toggle="list" th:attr="href='#target_' + ${item.jobValue}, id=((${item.jobValue} == 0) ? firstTarget), class=((${item.jobValue} == 0) ? 'list-group-item list-group-item-action show active' : 'list-group-item list-group-item-action')" role="tab" aria-selected="false" th:text="${item.jobValue}">
+					<a data-toggle="list" th:attr="href='#target_' + ${item.jobValue}, id=((${item.jobValue} == 0) ? firstTarget), class=((${item.jobValue} == 0) ? 'list-group-item list-group-item-action show active' : 'list-group-item list-group-item-action')" role="tab" aria-selected="false" th:text="${item.jobName}">
 			        </a>
 			        </th:block>
 				</th:block>
@@ -33,9 +33,12 @@
 													<ul class="nav nav-pills card-header-pills pull-right" role="tablist">
 														<th:block th:each="jobDetail : ${jobDetailList}">
 															<li class="nav-item" th:if="${item.jobValue == jobDetail.jobValue}">
-																<a data-toggle="tab" th:attr="class='nav-link',href='#jobDetail_' + ${jobDetail.jobDetailSeq}" th:text="${jobDetail.jobDetailSeq}"></a>
+																<a data-toggle="tab" th:attr="class='nav-link',href='#jobDetail_' + ${jobDetail.jobDetailSeq}" th:text="${jobDetail.firstJob}"></a>
 															</li>
 														</th:block>
+														<li class="nav-item">
+															<a data-toggle="tab" th:attr="class='nav-link',href='#jobDetail_' + ${item.jobValue} + '_99'" th:text="기타"></a>
+														</li>
 													</ul>
 											</div>
 											<div class="card-body">
@@ -48,11 +51,35 @@
 																<button class="btn btn-outline-info asc" th:attr="onclick=|detailSort('acc_D${jobDetail.jobDetailSeq}', 'rate', this)|">비율순</button>
 															</div>
 															<div class="accordion" id="accordionExample" th:attr="id='acc_D' + ${jobDetail.jobDetailSeq}">
-																
+																<div class="card-header">
+																	<div class="text-sm text-muted p-2 mt-1">
+																		▶ 아바타 마켓에 등록된 물품으로 30분 간격으로 갱신됩니다.<br>
+																		▶ 직업별로 나뉘는 기준은 상의아바타 옵션만 보고 결정됩니다.<br>
+																		▶ 메인에 보이는 비율(%)은 아바타 상세정보의 총 비율입니다.<br>
+																		▶ 직업별 랭킹(1 ~ 200위)을 기준으로 아바타옵션, 엠블렘 사용비율(%)이 결정됩니다.
+																	</div>
+																</div>
 															</div>
 														
 														</div>
 													</th:block>
+														<div th:attr="class='tab-pane fade',id='jobDetail_' + ${item.jobValue} + '_99'" role="tabpanel">
+															<div class="float-right mb-3">
+																<button class="btn btn-outline-info asc" th:attr="onclick=|detailSort('acc_${item.jobValue}_D99', 'degree', this)|">이름순</button>
+																<button class="btn btn-outline-info asc" th:attr="onclick=|detailSort('acc_${item.jobValue}_D99', 'price', this)|">가격순</button>
+															</div>
+															<div class="accordion" id="accordionExample" th:attr="id='acc_' + ${item.jobValue} + '_D99'">
+																<div class="card-header">
+																	<div class="text-sm text-muted p-2 mt-1">
+																		▶ 아바타 마켓에 등록된 물품으로 30분 간격으로 갱신됩니다.<br>
+																		▶ 직업별로 나뉘는 기준은 상의아바타 옵션만 보고 결정됩니다.<br>
+																		▶ 메인에 보이는 비율(%)은 아바타 상세정보의 총 비율입니다.<br>
+																		▶ 직업별 랭킹(1 ~ 200위)을 기준으로 아바타옵션, 엠블렘 사용비율(%)이 결정됩니다.<br>
+																		▶ 기타는 랭킹데이터에 존재하지 않는 상의아바타 옵션입니다.
+																	</div>
+																</div>
+															</div>
+														</div>
 												</div>
 												</div>
 												</div>
@@ -116,6 +143,7 @@
 		var detail = [];
 		var count = 0;
 		var totalRate = 0;
+		var classTxt = '';
 		console.log('시작');
 		$.each(show.data.outer, function(i, item) {
 			$.each(show.data.outer[i], function(j, item2) {
@@ -126,17 +154,49 @@
 							detail = [];
 							count = 0;
 							totalRate = 0;
+							
+							detail.push('<table class="table table-striped"><thead><tr>');
+							detail.push('<th style="width:25%;">아바타 명</th>');
+							detail.push('<th style="width:30%">선택옵션 및 비율</th>');
+							detail.push('<th class="d-none d-md-table-cell" style="width:30%">엠블렘 및 비율</th>');
+							detail.push('</tr></thead><tbody>');
+							
 							$.each(item5.details, function(n, item6) {
-								detail.push(item6.itemName);
-								detail.push(item6.choiceOption);
-								detail.push(item6.choiceOptionRate);
-								detail.push(item6.emblemName1);
-								detail.push(item6.emblemName2);
-								detail.push(item6.emblemName3);
-								detail.push(item6.emblemRate1);
-								detail.push(item6.emblemRate2);
-								detail.push(item6.emblemRate3);
+// 								detail.push(item6.itemName);
+// 								detail.push(item6.choiceOption);
+// 								detail.push(item6.choiceOptionRate);
+// 								detail.push(item6.emblemName1);
+// 								detail.push(item6.emblemName2);
+// 								detail.push(item6.emblemName3);
+// 								detail.push(item6.emblemRate1);
+// 								detail.push(item6.emblemRate2);
+// 								detail.push(item6.emblemRate3);
 								
+								detail.push('<tr>');
+								detail.push('<td>'+ item6.itemName +'</td>');
+								classTxt = Number(item6.choiceOptionRate) >= 50 ? "text-success" : "text-danger";
+								detail.push('<td>'+ item6.choiceOption);
+								detail.push('<span class="'+classTxt+'">[' + item6.choiceOptionRate + '%]</span></td>');
+								detail.push('<td>');
+								if (item6.emblemName1) {
+									detail.push('<p class="custom-p">'+item6.emblemName1);
+									classTxt = Number(item6.emblemRate1) >= 50 ? "text-success" : "text-danger";
+									detail.push('<span class="'+classTxt+'">['+item6.emblemRate1+'%]</span></p>');
+								}
+								if (item6.emblemName2) {
+									detail.push('<p class="custom-p">'+item6.emblemName2);
+									classTxt = Number(item6.emblemRate2) >= 50 ? "text-success" : "text-danger";
+									detail.push('<span class="'+classTxt+'">['+item6.emblemRate2+'%]</span></p>');
+								}
+								if (item6.emblemName3) {
+									detail.push('<p class="custom-p">'+item6.emblemName3);
+									classTxt = Number(item6.emblemRate3) >= 50 ? "text-success" : "text-danger";
+									detail.push('<span class="'+classTxt+'">['+item6.emblemRate3+'%]</span></p>');
+								}
+								
+								detail.push('</td>');
+								detail.push('</tr>');
+							
 								item6.choiceOptionRate == '0.0' ? '' : count++;
 								item6.emblemRate1 == '0.0' ? '' : count++;
 								item6.emblemRate2 == '0.0' ? '' : count++;
@@ -144,21 +204,37 @@
 								totalRate += ((Number(item6.choiceOptionRate) + Number(item6.emblemRate1) + Number(item6.emblemRate2) + Number(item6.emblemRate3)));
 							});
 							
+							detail.push('</tbody></table>');
+							
 							html.push('<div class="card" data-price="'+item5.price+'" data-degree="'+item5.degree+'" data-rate="'+(Number(totalRate) / Number(count)).toFixed(2)+'">');
 							html.push('<div class="card-header" id="heading'+ item5.marketMstSeq +'">');
 							html.push('<h5 class="card-title my-2">');
-							html.push('<a href="#" data-toggle="collapse" data-target="#Detail'+item5.marketMstSeq+'" aria-expanded="true" aria-controls="collapse1" class="">');
-							html.push(item5.marketMstSeq);
-							html.push(item5.price);
-							html.push(emblem[item5.emblemCode]);
-							html.push('   비율 : ' + (Number(totalRate) / Number(count)).toFixed(2));
+							html.push('<a nohref data-toggle="collapse" data-target="#Detail'+item5.marketMstSeq+'" aria-expanded="true" aria-controls="collapse1" class="">');
+							if (item5.jobDetailSeq == '99') {
+								html.push('<span class="text-success" style="padding-right:10px;">[' + emblem[item5.emblemCode] +']</span>');
+							} else {
+								classTxt = (Number(totalRate) / Number(count)).toFixed(2) >= 50 ? "text-success" : "text-danger";
+								html.push('<span class="'+classTxt+'" style="padding-right:10px;">[' + emblem[item5.emblemCode] + ' - ' + (Number(totalRate) / Number(count)).toFixed(2) +'%]</span>');
+							}
+							
+							html.push('<strong style="padding-right:20px;">' + item5.title + '</strong>');
+							html.push(numberWithCommas(item5.price) + '골드');
 							html.push('</a></h5></div>');
-							html.push('<div id="Detail'+item5.marketMstSeq+'" class="collapse" aria-labelledby="heading'+ item5.marketMstSeq +'" data-parent="#acc_'+ j +'" style="">');
+							if (item5.jobDetailSeq == '99') {
+								html.push('<div id="Detail'+item5.marketMstSeq+'" class="collapse" aria-labelledby="heading'+ item5.marketMstSeq +'" data-parent="#acc_'+ item5.jobValue +'_'+ j +'" style="">');
+							} else {
+								html.push('<div id="Detail'+item5.marketMstSeq+'" class="collapse" aria-labelledby="heading'+ item5.marketMstSeq +'" data-parent="#acc_'+ j +'" style="">');
+							}
+							
 							html.push('<div class="card-body">');
 							html.push(detail.join(''));
 							html.push('</div></div></div>');
 							
-							$('#acc_D' + item5.jobDetailSeq).append(html.join(''));
+							if (item5.jobDetailSeq == '99') {
+								$('#acc_' + item5.jobValue + '_D' + item5.jobDetailSeq).append(html.join(''));
+							} else {
+								$('#acc_D' + item5.jobDetailSeq).append(html.join(''));
+							}
 						});
 					});
 				})
