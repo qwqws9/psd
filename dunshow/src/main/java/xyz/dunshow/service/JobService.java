@@ -20,28 +20,28 @@ import xyz.dunshow.util.ObjectMapperUtils;
 public class JobService {
 
     private final JobRepository jobRepository;
-    
+
     private final JobDetailRepository jobDetailRepository;
-    
+
     public List<JobDto> getJobList() {
         List<JobDto> list = ObjectMapperUtils.mapList(this.jobRepository.findAll(), JobDto.class);
         list = list.stream().filter(j -> !"99".equals(j.getJobValue())).collect(Collectors.toList());
         return list;
     }
-    
+
     public List<JobDetailDto> getJobDetailList() {
         List<JobDetailDto> list = ObjectMapperUtils.mapList(this.jobDetailRepository.findAll(), JobDetailDto.class);
         list = list.stream().filter(j -> !"99".equals(j.getJobValue())).collect(Collectors.toList());
         return list;
     }
-    
+
     public List<PartsDto> getPartsList() {
         PartsDto p = new PartsDto();
         List<PartsDto> list = Lists.newArrayList();
-        
+
         String[] wearInfoEngArr = {"hair", "cap", "face", "neck", "coat", "pants", "belt", "shoes", "skin"};
         String[] wearInfoKorArr = {"머리", "모자", "얼굴", "목가슴", "상의", "하의", "허리", "신발", "피부"};
-        
+
         for (int i = 0; i < wearInfoEngArr.length; i++) {
             p = new PartsDto();
             p.setPartsSeq(i+"");
@@ -49,7 +49,7 @@ public class JobService {
             p.setPartsKorName(wearInfoKorArr[i]);
             list.add(p);
         }
-        
+
         return list;
     }
 }

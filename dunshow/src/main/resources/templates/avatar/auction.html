@@ -88,6 +88,26 @@
 												</div>
 												</div>
 </div>
+
+         <div class="modal fade" id="sizedModalLg" tabindex="-1" style="display: none;" aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="modalTitle"></h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		             				<span aria-hidden="true">×</span>
+		           			</button>
+					</div>
+					<div class="modal-body m-3" id="modalBody">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
 </div>
 
 <th:block layout:fragment="script">
@@ -113,6 +133,7 @@
 // 				var i;
 				var detail = res.data.data;
 				show.data.outer = res.data.outer;
+				show.data.price = res.data.info.price;
 				a();
 				$('#marketDate').text('갱신 : ' + res.data.marketDate);
 				console.log(res);
@@ -139,6 +160,7 @@
 	}
 	
 	function a() {
+		show.data.detail = [];
 		var html = [];
 		var detail = [];
 		var count = 0;
@@ -154,12 +176,19 @@
 							detail = [];
 							count = 0;
 							totalRate = 0;
+							show.data.detail.push(item5);
+							
+							detail.push('<button onclick="customEmblem('+(show.data.detail.length - 1)+')" class="btn btn-primary" data-toggle="modal" data-target="#sizedModalLg"></button>');
 							
 							detail.push('<table class="table table-striped"><thead><tr>');
 							detail.push('<th style="width:25%;">아바타 명</th>');
 							detail.push('<th style="width:30%">선택옵션 및 비율</th>');
 							detail.push('<th class="d-none d-md-table-cell" style="width:30%">엠블렘 및 비율</th>');
 							detail.push('</tr></thead><tbody>');
+							
+							
+							// onclick 하나 만들어서 param으로 show.data.detail.length - 1 인자 넘기기
+							
 							
 							$.each(item5.details, function(n, item6) {
 // 								detail.push(item6.itemName);
@@ -300,6 +329,91 @@
 			$('#'+target).append(row);
 		})
 	}
+	
+	function customEmblem(idx) {
+    	var target = show.data.detail[idx];
+    	var detail = [];
+    	var classTxt = '';
+    	var copy = [], platinum = [];
+    	var price = show.data.price['D'+target.jobDetailSeq];
+    	var emblem = {
+    			'cap' : 'red',
+    			'hair' : 'red',
+    			'coat' : 'green',
+    			'pants' : 'green',
+    			'shoes' : 'blue',
+    			'belt' : 'blue',
+    			'skin' : 'all',
+    			'neck' : 'yellow',
+    			'face' : 'yellow'
+    	}
+    	
+    	detail.push('<table class="table table-striped"><thead><tr>');
+		detail.push('<th style="width:25%;">아바타 명</th>');
+		detail.push('<th style="width:25%">선택옵션 및 비율</th>');
+		detail.push('<th style="width:25%">엠블렘 및 비율</th>');
+		detail.push('<th style="width:25%">엠블렘 및 비율</th>');
+		detail.push('</tr></thead><tbody>');
+		
+		$.each(target.details, function(i, item) {
+			copy = [];
+			platinum = [];
+			detail.push('<tr>');
+			detail.push('<td>'+ item.itemName +'</td>');
+			classTxt = Number(item.choiceOptionRate) >= 50 ? "text-success" : "text-danger";
+			detail.push('<td>'+ item.choiceOption);
+			detail.push('<span class="'+classTxt+'">[' + item.choiceOptionRate + '%]</span></td>');
+			detail.push('<td>');
+			if (item.emblemName1) {
+				detail.push('<p class="custom-p">'+item.emblemName1);
+				classTxt = Number(item.emblemRate1) >= 50 ? "text-success" : "text-danger";
+				detail.push('<span class="'+classTxt+'">['+item.emblemRate1+'%]</span></p>');
+			}
+			if (item.emblemName2) {
+				detail.push('<p class="custom-p">'+item.emblemName2);
+				classTxt = Number(item.emblemRate2) >= 50 ? "text-success" : "text-danger";
+				detail.push('<span class="'+classTxt+'">['+item.emblemRate2+'%]</span></p>');
+			}
+			if (item.emblemName3) {
+				detail.push('<p class="custom-p">'+item.emblemName3);
+				classTxt = Number(item.emblemRate3) >= 50 ? "text-success" : "text-danger";
+				detail.push('<span class="'+classTxt+'">['+item.emblemRate3+'%]</span></p>');
+			}
+			detail.push('</td>');
+			
+			var tempArr = price[emblem[item.slotId]];
+			$.each(tempArr, function(j, item2) {
+				copy.push('<option value="'+item2.price+'">'+item2.emblemName + ' ['+ item2.rate +']</option>');
+			});
+			detail.push('<td>');
+			if (item.slotId == 'coat') {
+				tempArr = price['platinum'];
+				$.each(tempArr, function(j, item2) {
+					platinum.push('<option value="'+item2.price+'">'+item2.emblemName + ' ['+ item2.rate +']</option>');
+				});
+				detail.push('<select class="form-control">');
+				detail.push('<option value="0">선택</option>');
+				detail.push(platinum.join(''));
+				detail.push('</select>');
+			}
+			
+			detail.push('<select class="form-control">');
+			detail.push('<option value="0">선택</option>');
+			detail.push(copy.join(''));
+			detail.push('</select>');
+			detail.push('<select class="form-control">');
+			detail.push('<option value="0">선택</option>');
+			detail.push(copy.join(''));
+			detail.push('</select>');
+			detail.push('</td>');
+			
+			detail.push('</tr>');
+    	})
+    	
+    	$('#modalBody').children().remove();
+    	$('#modalTitle').text(target.title);
+    	$('#modalBody').append(detail.join(''));
+    }
 </script>
 </th:block>
 

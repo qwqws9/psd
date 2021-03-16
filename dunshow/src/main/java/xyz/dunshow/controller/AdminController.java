@@ -1,16 +1,12 @@
 package xyz.dunshow.controller;
 
-import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.util.UrlPathHelper;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Maps;
@@ -20,7 +16,6 @@ import xyz.dunshow.annotation.LoginUser;
 import xyz.dunshow.constants.ErrorMessage;
 import xyz.dunshow.constants.UserRole;
 import xyz.dunshow.dto.AjaxResponse;
-import xyz.dunshow.dto.InfoDto;
 import xyz.dunshow.dto.UserSession;
 import xyz.dunshow.exception.BusinessException;
 import xyz.dunshow.exception.PageException;
@@ -58,7 +53,7 @@ public class AdminController extends BaseController{
     @ResponseBody
     @JsonView(Views.Simple.class)
     public AjaxResponse data() {
-    	
+        
         Map<String, Object> map = Maps.newHashMap();
         map.put("data", "1234");
 //        System.out.println(super.getRequest().getHeader("Referer"));
@@ -99,29 +94,22 @@ public class AdminController extends BaseController{
         } else if ("initOptionAndEmblemByRankData".equals(target)) {
             this.adminService.initOptionAndEmblemByRankData();
         } else if ("testDataCase".equals(target)) {
-        	this.dataService.test();
+            this.dataService.test();
         } else if ("initEmblemRateData".equals(target)) {
-        	this.adminService.initEmblemRateData();
+            this.adminService.initEmblemRateData();
         } else if ("bakEmblemRateData".equals(target)) {
-        	this.adminService.bakEmblemRateData();
+            this.adminService.bakEmblemRateData();
         } else if ("initOptionAbilityData".equals(target)) {
-        	this.adminService.initOptionAbilityData();
+            this.adminService.initOptionAbilityData();
         } else if ("bakOptionAbilityData".equals(target)) {
-        	this.adminService.bakOptionAbilityData();
+            this.adminService.bakOptionAbilityData();
+        } else if ("getEmblemPrice".equals(target)) {
+            this.dataService.getEmblemPrice();
+        } else if ("initMarketMaster".equals(target)) {
+            this.dataService.initMarketMaster();
         }
 
         return new AjaxResponse("200", "성공");
     }
 
-    @GetMapping("/charIdTest.ajax")
-    @ResponseBody
-    @JsonView(Views.Simple.class)
-    public AjaxResponse charIdTest(String server, String name) {
-        Map<String, Object> map = Maps.newHashMap();
-
-        List<InfoDto> list = this.openApiService.getCharacterId(server, name, "50");
-        map.put("data", list);
-
-        return new AjaxResponse(map);
-    }
 }

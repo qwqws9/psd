@@ -7,9 +7,11 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import xyz.dunshow.constants.ApiKey;
+import xyz.dunshow.constants.CacheKey;
 import xyz.dunshow.mapper.MarketMasterMapper;
 import xyz.dunshow.service.AvatarService;
 import xyz.dunshow.service.DataService;
+import xyz.dunshow.service.MarketMasterService;
 import xyz.dunshow.util.DateUtils;
 import xyz.dunshow.util.ServerUtil;
 
@@ -22,6 +24,8 @@ public class CommandLineAppStartupRunner implements CommandLineRunner{
 	private final MarketMasterMapper marketMasterMapper;
 	
 	private final DataService dataService;
+	
+	private final MarketMasterService marketMasterService;
 	
 	@Override
 	public void run(String... args) throws Exception {
@@ -40,7 +44,10 @@ public class CommandLineAppStartupRunner implements CommandLineRunner{
 		this.avatarService.getCorrectOption();
 		// 마켓데이터 초기화
 //		this.dataService.initMarketMaster();
-		this.marketMasterMapper.selectAllMasterAndDetail1();
+		
+		// 운영시 삭제
+		this.marketMasterService.getAllMasterAndDetail1();
+		this.marketMasterService.getEmblemAllWithPrice1();
 		ServerUtil.MARKET_DATA_TIME = DateUtils.getServerDate(new Date());
 //		this.avatarService.getAllAvatarList();
 		

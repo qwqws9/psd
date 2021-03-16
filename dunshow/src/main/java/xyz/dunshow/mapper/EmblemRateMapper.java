@@ -10,4 +10,8 @@ import xyz.dunshow.dto.EmblemRateDto;
 public interface EmblemRateMapper {
 	
 	List<EmblemRateDto> selectAll();
+	
+	List<EmblemRateDto> selectDistinctAll();
+	
+	List<EmblemRateDto> selectAllWithPrice();
 }

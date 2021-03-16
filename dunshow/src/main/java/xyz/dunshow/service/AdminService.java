@@ -32,7 +32,6 @@ import xyz.dunshow.constants.PartsName;
 import xyz.dunshow.dto.EmblemDto;
 import xyz.dunshow.dto.EmblemRateDto;
 import xyz.dunshow.dto.JobDetailDto;
-import xyz.dunshow.dto.MarketMasterDto;
 import xyz.dunshow.dto.OptionAbilityDto;
 import xyz.dunshow.dto.ShowRoomDto;
 import xyz.dunshow.entity.Emblem;
@@ -44,7 +43,6 @@ import xyz.dunshow.entity.RankData;
 import xyz.dunshow.entity.ShowRoom;
 import xyz.dunshow.exception.BusinessException;
 import xyz.dunshow.mapper.JobDetailMapper;
-import xyz.dunshow.mapper.MarketMasterMapper;
 import xyz.dunshow.repository.EmblemRateRepository;
 import xyz.dunshow.repository.EmblemRepository;
 import xyz.dunshow.repository.JobDetailRepository;
@@ -81,8 +79,6 @@ public class AdminService {
     private final EmblemRateRepository emblemRateRepository;
     
     private final EnumCodeUtil enumCodeUtil;
-    
-    private final MarketMasterMapper marketMasterMapper;
     
     private final List<String> buff = Arrays.asList(
             "오버드라이브",
@@ -772,10 +768,6 @@ public class AdminService {
     }
 
     public void test() {
-    	long start = System.currentTimeMillis();
-    	List<MarketMasterDto> list = this.marketMasterMapper.selectAllMasterAndDetail1();
-    	long end = System.currentTimeMillis();
-    	System.out.println(end - start);
-    	System.out.println();
+    	
     }
 }

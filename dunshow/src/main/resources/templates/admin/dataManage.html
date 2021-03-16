@@ -21,6 +21,8 @@
 							<button class="btn btn-outline-primary" onclick="dataManage('getEmblem')">EMBLEM</button>
 							<button class="btn btn-outline-danger" onclick="dataManage('getRankByDundam')">RANK_DATA</button>
 							<button class="btn btn-outline-primary" onclick="dataManage('initOptionAndEmblemByRankData')">RANK_DATA -> OPTION, EMBLEM RATE</button>
+							<button class="btn btn-outline-primary" onclick="dataManage('getEmblemPrice')">EMBLEM RATE -> EMBLEM PRICE</button>
+							<button class="btn btn-outline-primary" onclick="dataManage('initMarketMaster')">MarketMaster Price</button>
 						</div>
 					</div>
 				</div>
@@ -90,6 +92,8 @@
 		<div id="getRankByDundam">rankData delete - select - insert (DunDam) 직업별 랭킹 1~200위 데이터를 크롤링합니다. (업데이트용) !!!!최초 DB 구성시에는 4. Init Rank Data 만 실행시켜 주세요.!!!! </div>
 		<div id="initJobDetail">JobDetail delete - select - insert (Noeple) 최초 DB 구성시에만 실행시켜주세요.</div>
 		<div id="initOptionAndEmblemByRankData">Rank Data로 Avatar Option, Emblem 비율을 생성합니다. Rank Data 필수</div>
+		<div id="getEmblemPrice">EmblemRate Data -> EmblemPrice Data insert</div>
+		<div id="initMarketMaster">MarketMaster Price 초기화합니다. 운영시 Task.java 스케쥴러 작동</div>
 		
 		
 		<!-- 테스트 -->
@@ -112,6 +116,34 @@
 		<div id="bakOptionAbilityData">DB(OPTION_ABILITY) --> classpath:static/initData/optionAbility.txt 데이터를 추출합니다.</div>
 	</div>
 
+
+
+
+
+
+
+		<!-- 테스트 공간 -->
+		
+		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#sizedModalLg">
+              Large
+            </button>
+            <div class="modal fade" id="sizedModalLg" tabindex="-1" style="display: none;" aria-hidden="true">
+				<div class="modal-dialog modal-lg" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title">Large modal</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	               				<span aria-hidden="true">×</span>
+	             			</button>
+						</div>
+						<div class="modal-body m-3">
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
 </div>
 <th:block layout:fragment="script">
     <script type="text/javascript">

@@ -8,4 +8,21 @@
 		  FROM EMBLEM_RATE
 	     ORDER BY JOB_DETAIL_SEQ, CAST(RATE AS DECIMAL(4,2)) DESC
 	</select>
+	
+	<select id="selectDistinctAll" resultType="EmblemRateDto">
+		SELECT *
+		  FROM EMBLEM_RATE
+	     GROUP BY EMBLEM_NAME
+	</select>
+	
+	<select id="selectAllWithPrice" resultType="EmblemRateDto">
+		SELECT R.EMBLEM_RATE_SEQ
+			, R.EMBLEM_NAME
+			, R.JOB_DETAIL_SEQ
+			, R.RATE
+			, R.EMBLEM_COLOR
+			, IFNULL(P.PRICE, '0') PRICE
+			FROM EMBLEM_RATE R LEFT JOIN EMBLEM_PRICE P ON R.EMBLEM_NAME = P.EMBLEM_NAME
+			ORDER BY R.JOB_DETAIL_SEQ, R.EMBLEM_COLOR, CAST(R.RATE AS DECIMAL(4,2)) DESC
+	</select>
 </mapper>

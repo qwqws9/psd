@@ -11,31 +11,33 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import lombok.RequiredArgsConstructor;
-import xyz.dunshow.constants.CacheKey;
 import xyz.dunshow.constants.Color;
 import xyz.dunshow.constants.PartsName;
 import xyz.dunshow.constants.Server;
+import xyz.dunshow.dto.EmblemPriceDto;
+import xyz.dunshow.dto.EmblemRateDto;
 import xyz.dunshow.dto.InfoDto;
 import xyz.dunshow.dto.JobDto;
 import xyz.dunshow.dto.MarketDetailDto;
 import xyz.dunshow.dto.MarketMasterDto;
 import xyz.dunshow.dto.RankingDto;
-import xyz.dunshow.entity.Job;
+import xyz.dunshow.entity.EmblemPrice;
 import xyz.dunshow.entity.JobDetail;
 import xyz.dunshow.entity.MarketDetail;
 import xyz.dunshow.entity.MarketMaster;
 import xyz.dunshow.entity.OptionAbility;
 import xyz.dunshow.exception.BusinessException;
+import xyz.dunshow.mapper.EmblemPriceMapper;
+import xyz.dunshow.mapper.EmblemRateMapper;
 import xyz.dunshow.mapper.MarketDetailMapper;
 import xyz.dunshow.mapper.MarketMasterMapper;
-import xyz.dunshow.repository.EmblemRepository;
+import xyz.dunshow.repository.EmblemPriceRepository;
 import xyz.dunshow.repository.JobDetailRepository;
 import xyz.dunshow.repository.JobRepository;
 import xyz.dunshow.repository.MarketDetailRepository;
@@ -49,31 +51,34 @@ import xyz.dunshow.util.ObjectMapperUtils;
 @RequiredArgsConstructor
 public class DataService {
 
-    private final OpenApiService api;
+    private final OpenApiService openApiService;
 
     private final EnumCodeUtil enumCodeUtil;
-    
+
     private final JobRepository jobRepository;
-    
+
     private final MarketMasterRepository marketMasterRepository;
-    
+
     private final MarketDetailRepository marketDetailRepository;
-    
+
     private final OptionAbilityRepository optionAbilityRepository;
-    
-    private final EmblemRepository emblemRepository;
-    
+
     private final JobDetailRepository jobDetailRepository;
-    
+
     private final MarketMasterMapper marketMasterMapper;
-    
+
     private final MarketDetailMapper marketDetailMapper;
-    
+
     private final JobService jobService;
-    
+
     private final RankingService rankingService;
-    
-    
+
+    private final EmblemPriceRepository emblemPriceRepository;
+
+    private final EmblemRateMapper emblemRateMapper;
+
+    private final EmblemPriceMapper emblemPriceMapper;
+
     public Map<String, Object> getSearchDetail(String server, String characterId) {
         // 유효성 체크
         if (StringUtils.isEmpty(this.enumCodeUtil.get(Server.CODE, server))) {
@@ -84,7 +89,7 @@ public class DataService {
         }
 
         // equip avatar 조회
-        JSONObject rs = this.api.getEquipAvatar(server, characterId);
+        JSONObject rs = this.openApiService.getEquipAvatar(server, characterId);
         if (rs.isEmpty()) {
             throw new BusinessException("정상적인 접근이 아닙니다.");
         }
@@ -132,7 +137,7 @@ public class DataService {
     }
     
     public Map<String, Object> getAuctionList(List<InfoDto> list) {
-    	if (CollectionUtils.isEmpty(list)) {
+        if (CollectionUtils.isEmpty(list)) {
             throw new BusinessException("입혀");
         }
 
@@ -144,7 +149,7 @@ public class DataService {
 
         for (InfoDto i : list) {
             // 가격 조회
-            rs = this.api.getAuction(i.getItemId(), i.getItemName(), "1");
+            rs = this.openApiService.getAuction(i.getItemId(), i.getItemName(), "1");
             jsonArr = (JSONArray) rs.get("rows");
             if (!rs.get("rows").toString().trim().equals("[]")) {
                 rs = (JSONObject) jsonArr.get(0);
@@ -156,7 +161,7 @@ public class DataService {
         for (InfoDto i : list) {
             // 가격이 비었을경우 시세 조회 (최대 10건의 평균값)
             if (StringUtils.isEmpty(i.getUnitPrice())) {
-                rs = this.api.getAuctionSold(i.getItemId(), i.getItemName(), "10");
+                rs = this.openApiService.getAuctionSold(i.getItemId(), i.getItemName(), "10");
                 Long price = 0L;
                 int count = 0;
                 jsonArr = (JSONArray) rs.get("rows");
@@ -204,120 +209,151 @@ public class DataService {
     @Transactional
 //    @CacheEvict(beforeInvocation = true, value = "")
     public void initMarketMaster() {
-    	//this.marketDetailRepository.deleteAll();
-    	//this.marketMasterRepository.deleteAll();
+        //this.marketDetailRepository.deleteAll();
+        //this.marketMasterRepository.deleteAll();
         this.marketDetailMapper.deleteAll();
         this.marketMasterMapper.deleteAll();
-    	List<JobDto> jobList = this.jobService.getJobList();
-    	StringBuilder sb = new StringBuilder();
-    	String[] code = {"100", "110", "120", "130", "999"};
-    	
-    	long startTime = System.currentTimeMillis();
-    	for (JobDto j : jobList) {
-    		if(StringUtils.isEmpty(j.getJobDesc())) { continue; }
-    		
+        List<JobDto> jobList = this.jobService.getJobList();
+        StringBuilder sb = new StringBuilder();
+        String[] code = {"100", "110", "120", "130", "999"};
+        
+        long startTime = System.currentTimeMillis();
+        for (JobDto j : jobList) {
+            if(StringUtils.isEmpty(j.getJobDesc())) { continue; }
+            
 
-    		// method call
-    		for (int i = 1; i < 17; i++) {
-    			sb.setLength(0);
-        		sb.append(j.getJobDesc());
-        		sb.append(" ");
-        		if (i == 16) {
-        			sb.append("클론");
-        		} else {
-        			sb.append(i);
-        			sb.append("차 레어");
-        		}
-    			for (int k = 0; k < code.length; k++) {
-    				this.getMarket(EncodeUtil.encodeURIComponent(sb.toString()), j.getJobId(), code[k], j.getJobValue(), i+"");
-    			}
-    		}
-    	}
-    	long endTime = System.currentTimeMillis();
-    	
-    	System.out.println("총 걸린시간...");
-    	System.out.println((endTime - startTime) + "밀리초");
+            // method call
+            for (int i = 1; i < 17; i++) {
+                sb.setLength(0);
+                sb.append(j.getJobDesc());
+                sb.append(" ");
+                if (i == 16) {
+                    sb.append("클론");
+                } else {
+                    sb.append(i);
+                    sb.append("차 레어");
+                }
+                for (int k = 0; k < code.length; k++) {
+                    this.getMarket(EncodeUtil.encodeURIComponent(sb.toString()), j.getJobId(), code[k], j.getJobValue(), i+"");
+                }
+            }
+        }
+        long endTime = System.currentTimeMillis();
+        
+        System.out.println("총 걸린시간...");
+        System.out.println((endTime - startTime) + "밀리초");
     }
     
     // 100, 110, 120, 130, 999
     private void getMarket(String searchTitle, String jobId, String emblemCode, String jobValue, String degree) {
-    	Map<String, String> colorMap = this.enumCodeUtil.getMap(Color.CODE);
-    	Map<String, String> partsMap = this.enumCodeUtil.getMap(PartsName.CODE);
-    	List<JobDetail> list = this.jobDetailRepository.findByJobValue(jobValue);
-    	List<Integer> jobDetail = Lists.newArrayList();
-    	for (JobDetail j : list) {
-    	    jobDetail.add(j.getJobDetailSeq());
+        Map<String, String> colorMap = this.enumCodeUtil.getMap(Color.CODE);
+        Map<String, String> partsMap = this.enumCodeUtil.getMap(PartsName.CODE);
+        List<JobDetail> list = this.jobDetailRepository.findByJobValue(jobValue);
+        List<Integer> jobDetail = Lists.newArrayList();
+        for (JobDetail j : list) {
+            jobDetail.add(j.getJobDetailSeq());
+        }
+        
+        MarketMasterDto master;
+        MarketDetailDto detail;
+        List<MarketDetailDto> detailList;
+        String jacketOption = null;
+        JSONObject rs = this.openApiService.getMarket(searchTitle, emblemCode, EncodeUtil.encodeURIComponent("레어"), jobId, "front", "8", "9", "50");
+        JSONArray arr = (JSONArray) rs.get("rows");
+        
+        for (Object o : arr) {
+            master = new MarketMasterDto();
+            detailList = Lists.newArrayList();
+            
+            JSONObject obj = (JSONObject) o;
+            master.setDegree(degree);
+            master.setJobValue(jobValue);
+            master.setEmblemCode(emblemCode);
+            master.setTitle(obj.get("title").toString());
+            master.setPrice(obj.get("price").toString());
+            
+            JSONArray arr2 = (JSONArray) obj.get("avatar");
+            for (Object o2 : arr2) {
+                detail = new MarketDetailDto();
+                
+                JSONObject obj2 = (JSONObject) o2;
+                detail.setSlotId(partsMap.get(obj2.get("slotName").toString())); // hair
+                detail.setItemName(obj2.get("itemName").toString());
+                detail.setChoiceOption(obj2.get("optionAbility") == null ? null : obj2.get("optionAbility").toString());
+                
+                if ("coat".equals(detail.getSlotId())) {
+                    jacketOption = detail.getChoiceOption(); // 이걸로 먼저 JOB_VALUE 조회 후 정해서 하위옵들 조회
+                }
+                
+                JSONArray arr3 = (JSONArray) obj2.get("emblems");
+                int count = 1;
+                for (Object o3 : arr3) {
+                    JSONObject obj3 = (JSONObject) o3;
+                    String slotColor = colorMap.get(obj3.get("slotColor").toString());
+                    if (count == 1) { detail.setEmblemColor1(slotColor); detail.setEmblemName1(obj3.get("itemName").toString()); }
+                    else if (count ==2) { detail.setEmblemColor2(slotColor); detail.setEmblemName2(obj3.get("itemName").toString()); }
+                    else { detail.setEmblemColor3(slotColor); detail.setEmblemName3(obj3.get("itemName").toString()); }
+                    count++;
+                }
+                
+                detailList.add(detail);
+            }
+            
+            List<OptionAbility> optionEntity = this.optionAbilityRepository.findByChoiceOptionAndJobDetailSeqIn(jacketOption, jobDetail);
+            int jobDetailSeq = 99;
+            if (optionEntity != null) {
+                String prevRate = "0.0";
+                for (OptionAbility op : optionEntity) {
+                    if (Double.parseDouble(prevRate) <= Double.parseDouble(op.getRate())) {
+                        jobDetailSeq = op.getJobDetailSeq();
+                    }
+                    prevRate = op.getRate();
+                }
+            }
+            master.setJobDetailSeq(jobDetailSeq);
+            MarketMaster entityMst = this.marketMasterRepository.save(ObjectMapperUtils.map(master, MarketMaster.class));
+            
+            for (MarketDetailDto m : detailList) {
+                m.setMarketMstSeq(entityMst.getMarketMstSeq());
+            }
+            
+            this.marketDetailRepository.saveAll(ObjectMapperUtils.mapList(detailList, MarketDetail.class));
+        }
+    }
+
+    /**
+     *  emblem_rate 데이터로 가격 조회
+     */
+    @Transactional
+    public void getEmblemPrice() {
+    	List<EmblemRateDto> list = this.emblemRateMapper.selectDistinctAll();
+    	if (CollectionUtils.isEmpty(list)) {
+    		throw new BusinessException("Data Empty");
     	}
     	
-    	MarketMasterDto master;
-    	MarketDetailDto detail;
-    	List<MarketDetailDto> detailList;
-    	String jacketOption = null;
-    	JSONObject rs = this.api.getMarket(searchTitle, emblemCode, EncodeUtil.encodeURIComponent("레어"), jobId, "front", "8", "9", "50");
-    	JSONArray arr = (JSONArray) rs.get("rows");
+    	this.emblemPriceMapper.deleteAll();
     	
-    	for (Object o : arr) {
-    		master = new MarketMasterDto();
-    		detailList = Lists.newArrayList();
+    	EmblemPriceDto price;
+    	for (EmblemRateDto r : list) {
+    		price = new EmblemPriceDto();
+    		JSONObject rs = this.openApiService.getAuctionSold(null, r.getEmblemName(), "20");
+    		JSONArray arr = (JSONArray) rs.get("rows");
+    		long totalPrice = 0;
+    		for (Object o : arr) {
+    			JSONObject obj = (JSONObject) o;
+    			totalPrice += (Long) obj.get("unitPrice");
+    		}
     		
-    	    JSONObject obj = (JSONObject) o;
-    	    master.setDegree(degree);
-    	    master.setJobValue(jobValue);
-    	    master.setEmblemCode(emblemCode);
-    	    master.setTitle(obj.get("title").toString());
-    	    master.setPrice(obj.get("price").toString());
-    	    
-    	    JSONArray arr2 = (JSONArray) obj.get("avatar");
-    	    for (Object o2 : arr2) {
-    	    	detail = new MarketDetailDto();
-    	    	
-    	        JSONObject obj2 = (JSONObject) o2;
-    	        detail.setSlotId(partsMap.get(obj2.get("slotName").toString())); // hair
-    	        detail.setItemName(obj2.get("itemName").toString());
-    	        detail.setChoiceOption(obj2.get("optionAbility") == null ? null : obj2.get("optionAbility").toString());
-    	        
-    	        if ("coat".equals(detail.getSlotId())) {
-    	            jacketOption = detail.getChoiceOption(); // 이걸로 먼저 JOB_VALUE 조회 후 정해서 하위옵들 조회
-    	        }
-    	        
-    	        JSONArray arr3 = (JSONArray) obj2.get("emblems");
-    	        int count = 1;
-    	        for (Object o3 : arr3) {
-    	            JSONObject obj3 = (JSONObject) o3;
-    	            String slotColor = colorMap.get(obj3.get("slotColor").toString());
-    	            if (count == 1) { detail.setEmblemColor1(slotColor); detail.setEmblemName1(obj3.get("itemName").toString()); }
-    	            else if (count ==2) { detail.setEmblemColor2(slotColor); detail.setEmblemName2(obj3.get("itemName").toString()); }
-    	            else { detail.setEmblemColor3(slotColor); detail.setEmblemName3(obj3.get("itemName").toString()); }
-    	            count++;
-    	        }
-    	        
-    	        detailList.add(detail);
-    	    }
-    	    
-    	    List<OptionAbility> optionEntity = this.optionAbilityRepository.findByChoiceOptionAndJobDetailSeqIn(jacketOption, jobDetail);
-    	    int jobDetailSeq = 99;
-    	    if (optionEntity != null) {
-    	        String prevRate = "0.0";
-    	        for (OptionAbility op : optionEntity) {
-    	            if (Double.parseDouble(prevRate) <= Double.parseDouble(op.getRate())) {
-    	                jobDetailSeq = op.getJobDetailSeq();
-    	            }
-    	            prevRate = op.getRate();
-    	        }
-    	    }
-    	    master.setJobDetailSeq(jobDetailSeq);
-    	    MarketMaster entityMst = this.marketMasterRepository.save(ObjectMapperUtils.map(master, MarketMaster.class));
-    	    
-    	    for (MarketDetailDto m : detailList) {
-    	    	m.setMarketMstSeq(entityMst.getMarketMstSeq());
-    	    }
-    	    
-    	    this.marketDetailRepository.saveAll(ObjectMapperUtils.mapList(detailList, MarketDetail.class));
+    		if (totalPrice != 0) {
+    			price.setEmblemName(r.getEmblemName());
+    			price.setPrice(Math.round(totalPrice / arr.size()) + "");
+    			this.emblemPriceRepository.save(price.toEntity(EmblemPrice.class));
+    		}
     	}
     }
-    
+
     public void test() {
-    	
+        
     }
     
     

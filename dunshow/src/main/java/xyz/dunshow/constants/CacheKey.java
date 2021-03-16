@@ -10,6 +10,9 @@ public class CacheKey {
 	
 	public static final String FIND_ALL_CORRECT_OPTION = "dddd";
 	
+	public static final String FIND_ALL_EMBLEM_PRICE_FIRST = "eeee";
+	public static final String FIND_ALL_EMBLEM_PRICE_SECOND = "ffff";
+	
 	
 	
 }

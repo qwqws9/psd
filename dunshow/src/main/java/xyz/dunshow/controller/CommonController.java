@@ -5,7 +5,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import lombok.RequiredArgsConstructor;
-import xyz.dunshow.constants.ApiKey;
 import xyz.dunshow.util.ServerUtil;
 
 @Controller

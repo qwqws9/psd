@@ -27,7 +27,6 @@ import xyz.dunshow.service.AvatarService;
 import xyz.dunshow.service.DataService;
 import xyz.dunshow.service.JobService;
 import xyz.dunshow.service.OpenApiService;
-import xyz.dunshow.service.RankingService;
 import xyz.dunshow.view.Views;
 
 @Controller
