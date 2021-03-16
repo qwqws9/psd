@@ -22,4 +22,5 @@ public class EmblemRateDto extends BaseDto {
     private String emblemColor;
     
     private String price;
+    private String jobValue;
 }

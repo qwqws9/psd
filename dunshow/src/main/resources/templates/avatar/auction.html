@@ -75,7 +75,7 @@
 																		▶ 직업별로 나뉘는 기준은 상의아바타 옵션만 보고 결정됩니다.<br>
 																		▶ 메인에 보이는 비율(%)은 아바타 상세정보의 총 비율입니다.<br>
 																		▶ 직업별 랭킹(1 ~ 200위)을 기준으로 아바타옵션, 엠블렘 사용비율(%)이 결정됩니다.<br>
-																		▶ 기타는 랭킹데이터에 존재하지 않는 상의아바타 옵션입니다.
+																		<span class="text-danger">▶ 기타는 랭킹데이터에 존재하지 않는 상의아바타 옵션입니다.</span>
 																	</div>
 																</div>
 															</div>
@@ -134,6 +134,8 @@
 				var detail = res.data.data;
 				show.data.outer = res.data.outer;
 				show.data.price = res.data.info.price;
+				show.data.etcColor = res.data.info.etcColor;
+				show.data.etcPlatinum = res.data.info.etcPlatinum;
 				a();
 				$('#marketDate').text('갱신 : ' + res.data.marketDate);
 				console.log(res);
@@ -176,9 +178,8 @@
 							detail = [];
 							count = 0;
 							totalRate = 0;
-							show.data.detail.push(item5);
 							
-							detail.push('<button onclick="customEmblem('+(show.data.detail.length - 1)+')" class="btn btn-primary" data-toggle="modal" data-target="#sizedModalLg"></button>');
+							detail.push('<button onclick="customEmblem('+(show.data.detail.length)+')" class="btn btn-primary" data-toggle="modal" data-target="#sizedModalLg">엠블렘 커스텀</button>');
 							
 							detail.push('<table class="table table-striped"><thead><tr>');
 							detail.push('<th style="width:25%;">아바타 명</th>');
@@ -187,7 +188,6 @@
 							detail.push('</tr></thead><tbody>');
 							
 							
-							// onclick 하나 만들어서 param으로 show.data.detail.length - 1 인자 넘기기
 							
 							
 							$.each(item5.details, function(n, item6) {
@@ -234,8 +234,10 @@
 							});
 							
 							detail.push('</tbody></table>');
+							item5.totalRate = (Number(totalRate) / Number(count)).toFixed(2);
+							show.data.detail.push(item5);
 							
-							html.push('<div class="card" data-price="'+item5.price+'" data-degree="'+item5.degree+'" data-rate="'+(Number(totalRate) / Number(count)).toFixed(2)+'">');
+							html.push('<div class="card" data-price="'+item5.price+'" data-degree="'+item5.degree+'" data-rate="'+item5.totalRate+'">');
 							html.push('<div class="card-header" id="heading'+ item5.marketMstSeq +'">');
 							html.push('<h5 class="card-title my-2">');
 							html.push('<a nohref data-toggle="collapse" data-target="#Detail'+item5.marketMstSeq+'" aria-expanded="true" aria-controls="collapse1" class="">');
@@ -336,7 +338,7 @@
     	var classTxt = '';
     	var copy = [], platinum = [];
     	var price = show.data.price['D'+target.jobDetailSeq];
-    	var emblem = {
+    	var emblemParts = {
     			'cap' : 'red',
     			'hair' : 'red',
     			'coat' : 'green',
@@ -346,23 +348,34 @@
     			'skin' : 'all',
     			'neck' : 'yellow',
     			'face' : 'yellow'
+    	}, slotId = {
+    			'cap' : '모자',
+    			'hair' : '머리',
+    			'coat' : '상의',
+    			'pants' : '하의',
+    			'shoes' : '신발',
+    			'belt' : '허리',
+    			'skin' : '피부',
+    			'neck' : '목가슴',
+    			'face' : '얼굴'
     	}
     	
+    	var info = '<div class="text-sm text-muted p-2 mt-1">'
+		 + '▶ 엠블렘 가격은 최근 판매금액 N건의 평균값 입니다. (최대 20건)<br>'
+		 + '▶ 엠블렘 가격은 30분 간격으로 갱신됩니다.<br>'
+		 + '</div>';
+    	detail.push(info);
     	detail.push('<table class="table table-striped"><thead><tr>');
-		detail.push('<th style="width:25%;">아바타 명</th>');
-		detail.push('<th style="width:25%">선택옵션 및 비율</th>');
-		detail.push('<th style="width:25%">엠블렘 및 비율</th>');
-		detail.push('<th style="width:25%">엠블렘 및 비율</th>');
+		detail.push('<th style="width:7%;">부위</th>');
+		detail.push('<th style="width:30%">엠블렘 및 비율</th>');
+		detail.push('<th style="width:30%">커스텀</th>');
 		detail.push('</tr></thead><tbody>');
 		
 		$.each(target.details, function(i, item) {
 			copy = [];
 			platinum = [];
 			detail.push('<tr>');
-			detail.push('<td>'+ item.itemName +'</td>');
-			classTxt = Number(item.choiceOptionRate) >= 50 ? "text-success" : "text-danger";
-			detail.push('<td>'+ item.choiceOption);
-			detail.push('<span class="'+classTxt+'">[' + item.choiceOptionRate + '%]</span></td>');
+			detail.push('<td>'+ slotId[item.slotId] +'</td>');
 			detail.push('<td>');
 			if (item.emblemName1) {
 				detail.push('<p class="custom-p">'+item.emblemName1);
@@ -381,27 +394,48 @@
 			}
 			detail.push('</td>');
 			
-			var tempArr = price[emblem[item.slotId]];
+			var tempArr = '';
+			if (target.jobDetailSeq == '99') {
+				tempArr = show.data.etcColor[emblemParts[item.slotId]];
+			} else {
+				tempArr = price[emblemParts[item.slotId]];
+			}
+			
 			$.each(tempArr, function(j, item2) {
-				copy.push('<option value="'+item2.price+'">'+item2.emblemName + ' ['+ item2.rate +']</option>');
+				if (target.jobDetailSeq == '99') {
+					copy.push('<option value="'+item2.price+'">'+item2.emblemName + '</option>');
+				} else {
+					copy.push('<option value="'+item2.price+'">'+item2.emblemName + ' ['+ item2.rate +']</option>');
+				}
+				
 			});
 			detail.push('<td>');
-			if (item.slotId == 'coat') {
-				tempArr = price['platinum'];
+			if (item.slotId == 'coat' || item.slotId == 'pants') {
+				if (target.jobDetailSeq == '99') {
+					tempArr = show.data.etcPlatinum['D'+target.jobValue];
+				} else {
+					tempArr = price['platinum'];
+				}
+				
 				$.each(tempArr, function(j, item2) {
-					platinum.push('<option value="'+item2.price+'">'+item2.emblemName + ' ['+ item2.rate +']</option>');
+					if (target.jobDetailSeq == '99') {
+						platinum.push('<option value="'+item2.price+'">'+item2.emblemName + '</option>');
+					} else {
+						platinum.push('<option value="'+item2.price+'">'+item2.emblemName + ' ['+ item2.rate +']</option>');
+					}
+					
 				});
-				detail.push('<select class="form-control">');
+				detail.push('<select class="form-control customEmblem" onchange="selectEmblem(this);">');
 				detail.push('<option value="0">선택</option>');
 				detail.push(platinum.join(''));
 				detail.push('</select>');
 			}
 			
-			detail.push('<select class="form-control">');
+			detail.push('<select class="form-control customEmblem" onchange="selectEmblem(this);">');
 			detail.push('<option value="0">선택</option>');
 			detail.push(copy.join(''));
 			detail.push('</select>');
-			detail.push('<select class="form-control">');
+			detail.push('<select class="form-control customEmblem" onchange="selectEmblem(this);">');
 			detail.push('<option value="0">선택</option>');
 			detail.push(copy.join(''));
 			detail.push('</select>');
@@ -411,9 +445,33 @@
     	})
     	
     	$('#modalBody').children().remove();
-    	$('#modalTitle').text(target.title);
+		var titleTxt = '';
+		var classTxt = '';
+		if (target.jobDetailSeq == '99') {
+			titleTxt = '<span class="'+ classTxt +'" style="padding-right:10px;">['+ emblem[target.emblemCode] + ']</span>';
+		} else {
+			classTxt = Number(target.totalRate) >= 50 ? 'text-success' : 'text-danger'; 
+			titleTxt = '<span class="'+ classTxt +'" style="padding-right:10px;">['+ emblem[target.emblemCode] + ' - ' + target.totalRate + '%]</span>';
+		}
+		
+		titleTxt += '<strong style="padding-right:10px;">'+ target.title +'</strong>';
+		titleTxt += '<span id="targetPrice">' + numberWithCommas(target.price) + '</span>골드';
+		titleTxt += '<span class="text-success" id="increasePrice" style="padding-left:10px; padding-right:10px;">+0</span>';
+		titleTxt += '<span id="totalPrice">0</span>골드';
+		
+    	$('#modalTitle').html(titleTxt);
     	$('#modalBody').append(detail.join(''));
     }
+	
+	function selectEmblem(obj) {
+		var unitPrice = 0;
+		$.each($('.customEmblem'), function() {
+			unitPrice += Number($(this).val());
+		})
+		$('#increasePrice').text('+' + numberWithCommas(unitPrice));
+		var total = numberRemoveCommas($('#targetPrice').text());
+		$('#totalPrice').text(numberWithCommas(Number(total) + Number(unitPrice)));
+	}
 </script>
 </th:block>
 

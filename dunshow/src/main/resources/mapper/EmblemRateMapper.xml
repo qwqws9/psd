@@ -22,7 +22,24 @@
 			, R.RATE
 			, R.EMBLEM_COLOR
 			, IFNULL(P.PRICE, '0') PRICE
+			, j.job_value
 			FROM EMBLEM_RATE R LEFT JOIN EMBLEM_PRICE P ON R.EMBLEM_NAME = P.EMBLEM_NAME
+			INNER JOIN job_detail j ON r.job_detail_seq = j.JOB_DETAIL_SEQ
 			ORDER BY R.JOB_DETAIL_SEQ, R.EMBLEM_COLOR, CAST(R.RATE AS DECIMAL(4,2)) DESC
 	</select>
+	
+	<select id="selectEtcPrice" resultType="EmblemRateDto">
+		SELECT R.EMBLEM_RATE_SEQ
+			, R.EMBLEM_NAME
+			, R.JOB_DETAIL_SEQ
+			, R.RATE
+			, R.EMBLEM_COLOR
+			, IFNULL(P.PRICE, '0') PRICE
+			, j.job_value
+			FROM EMBLEM_RATE R LEFT JOIN EMBLEM_PRICE P ON R.EMBLEM_NAME = P.EMBLEM_NAME
+			INNER JOIN job_detail j ON r.job_detail_seq = j.JOB_DETAIL_SEQ
+			GROUP BY emblem_color, emblem_name
+			ORDER BY R.JOB_DETAIL_SEQ, R.EMBLEM_COLOR, CAST(R.RATE AS DECIMAL(4,2)) DESC
+	</select>
+	
 </mapper>

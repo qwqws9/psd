@@ -93,6 +93,24 @@ public class MarketMasterService {
 
         map.put("price", outerMap);
 
+        List<EmblemRateDto> list2 = this.emblemRateMapper.selectEtcPrice();
+        Map<String, List<EmblemRateDto>> etcMap = Maps.newHashMap();
+        Map<String, List<EmblemRateDto>> etcMap2 = Maps.newHashMap();
+        for (EmblemRateDto e : list2) {
+            if ("platinum".equals(e.getEmblemColor())) {
+                List<EmblemRateDto> emblemMap = etcMap2.getOrDefault("D"+ e.getJobValue(), new ArrayList<EmblemRateDto>());
+                emblemMap.add(e);
+                etcMap2.putIfAbsent("D" + e.getJobValue(), emblemMap);
+            } else {
+                List<EmblemRateDto> emblemMap = etcMap.getOrDefault(e.getEmblemColor(), new ArrayList<EmblemRateDto>());
+                emblemMap.add(e);
+                etcMap.putIfAbsent(e.getEmblemColor(), emblemMap);
+            }
+        }
+
+        map.put("etcColor", etcMap);
+        map.put("etcPlatinum", etcMap2);
+        
         return map;
     }
 

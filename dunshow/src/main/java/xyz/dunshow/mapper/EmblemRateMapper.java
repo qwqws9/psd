@@ -14,4 +14,6 @@ public interface EmblemRateMapper {
 	List<EmblemRateDto> selectDistinctAll();
 	
 	List<EmblemRateDto> selectAllWithPrice();
+	
+	List<EmblemRateDto> selectEtcPrice();
 }
